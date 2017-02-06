@@ -1,22 +1,24 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NeuralBotLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralBotLib.Tests {
-    [TestClass()]
+using Xunit;
+using FsCheck.Xunit;
+
+using NeuralBotLib;
+
+namespace NeuralBotLibTests {
     public class NeuralNetworkTests {
-        [TestMethod()]
-        public void fTest() {
-            Assert.Fail();
+        [Property]
+        public bool fOfXIsAlwaysGreaterThanX(int x) {
+            return NeuralNetwork.f(x) > x;
         }
 
-        [TestMethod()]
-        public void gTest() {
-            Assert.Fail();
+        [Fact]
+        public void fOf4Equals8() {
+            Assert.Equal(8, NeuralNetwork.f(4));
         }
     }
 }

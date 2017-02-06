@@ -9,8 +9,5 @@ namespace NeuralBotLib {
         public static int f(int x) {
             return x * 2;
         }
-        public static double g(double x) {
-            return x + 1;
-        }
     }
 }
