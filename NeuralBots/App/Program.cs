@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using NeuralBotLib;
+
 namespace App {
     class Program {
         static void Main(string[] args) {
-            Console.WriteLine(NeuralBotLib.NeuralNetwork.f(10));
+            Console.WriteLine(NeuralNetwork.Sigmoid(10));
         }
     }
 }
