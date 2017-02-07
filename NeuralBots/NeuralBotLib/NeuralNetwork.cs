@@ -10,9 +10,21 @@ namespace NeuralBotLib {
             return new double[0];
         }
 
-        public static double NEval(double[] weights, double[] inputs) {
-            if (weights.Length != inputs.Length+1) throw new IncorrectWeightInputException(weights.Length, inputs.Length);
-            return Sigmoid(weights[0]);
+        public static double NeuronEval(double[] weights, double[] inputs) {
+            if (weights == null || inputs == null) throw new ArgumentNullException();
+            if (weights.Length == 0) throw new EmptyWeightsException();
+            if (inputs.Length + 1 > weights.Length) throw new ExcessiveInputsException();
+            if (weights.Length > inputs.Length + 1) throw new ExcessiveWeightsException();
+            double result = 0;
+            for (int i = 0; i < inputs.Length; i++) result += weights[i] * inputs[i];
+            result += weights.Last();
+            return Sigmoid(result);
+        }
+
+        public static void NeuronLayerEval(double[,] wss, double[] ins) {
+            if (wss == null || ins == null) throw new ArgumentNullException();
+            if (wss.GetLength(0) == 0) throw new EmptyWeightsException();
+
         }
 
         public static double Sigmoid(double x) {
@@ -22,24 +34,21 @@ namespace NeuralBotLib {
             return 1d / (1d + Math.Pow(Math.E, -x));
         }
 
-        public class IncorrectWeightInputException : Exception {
-            public enum ErrorTypes {
-                ExcessiveInputs,
-                ExcessiveWeights
-            }
-
-            public int WeightsLength { get; }
-            public int InputsLength { get; }
-            public ErrorTypes ErrorType { get; }
-
-            public IncorrectWeightInputException(int weightLength, int inputsLength) : base() {
-                WeightsLength = weightLength;
-                InputsLength = inputsLength;
-                if (WeightsLength > InputsLength)
-                    ErrorType = ErrorTypes.ExcessiveWeights;
-                else
-                    ErrorType = ErrorTypes.ExcessiveInputs;
-            }
+        public class NeuralException : Exception {
+            public NeuralException() : base() { }
+            public NeuralException(string message) : base(message) { }
+        }
+        public class ExcessiveInputsException : NeuralException {
+            public ExcessiveInputsException() : base() { }
+            public ExcessiveInputsException(string message) : base(message) { }
+        }
+        public class ExcessiveWeightsException : NeuralException {
+            public ExcessiveWeightsException() : base() { }
+            public ExcessiveWeightsException(string message) : base(message) { }
+        }
+        public class EmptyWeightsException : NeuralException {
+            public EmptyWeightsException() : base() { }
+            public EmptyWeightsException(string message) : base(message) { }
         }
     }
 }
