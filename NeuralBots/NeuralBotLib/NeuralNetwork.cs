@@ -10,20 +10,34 @@ namespace NeuralBotLib {
             return new double[0];
         }
 
-        public static double NeuronEval(double[] weights, double[] inputs) {
-            if (weights == null || inputs == null) throw new ArgumentNullException();
+        public static double NeuronEval(Func<double, double> activation, double[] weights, double[] inputs) {
+            if (activation == null || weights == null || inputs == null) throw new ArgumentNullException();
             if (weights.Length == 0) throw new EmptyWeightsException();
             if (inputs.Length + 1 > weights.Length) throw new ExcessiveInputsException();
             if (weights.Length > inputs.Length + 1) throw new ExcessiveWeightsException();
-            double result = 0;
-            for (int i = 0; i < inputs.Length; i++) result += weights[i] * inputs[i];
-            result += weights.Last();
-            return Sigmoid(result);
+            return activation(zipWeightsAndInputs(weights, inputs));
         }
 
-        public static void NeuronLayerEval(double[,] wss, double[] ins) {
-            if (wss == null || ins == null) throw new ArgumentNullException();
-            if (wss.GetLength(0) == 0) throw new EmptyWeightsException();
+        public static double[] NeuronLayerEval(Func<double, double> activation, double[][] wss, double[] ins) {
+            if (activation == null || wss == null || ins == null) throw new ArgumentNullException();
+            double[] output = new double[wss.Length];
+            for (int i = 0; i < wss.Length; i++) output[i] = NeuronEval(activation, wss[i], ins);
+            return output;
+        }
+
+        //private static double[][] multiDimensionalArrayToJaggedArray(double[,] array) {
+        //    double[][] result = new double[array.GetLength(0)][];
+        //    for (int i = 0; i < array.GetLength(0); i++) {
+        //        result[i] = new double[array.GetLength(1)];
+        //        for (int j = 0; j < array.GetLength(1); j++) result[i][j] = array[j,i];
+        //    }
+        //    return result;
+        //}
+
+        private static double zipWeightsAndInputs(double[] weights, double[] inputs) {
+            double result = 0;
+            for (int i = 0; i < inputs.Length; i++) result += weights[i] * inputs[i];
+            return result + weights.Last();
 
         }
 
