@@ -12,177 +12,382 @@ using NeuralBotLib;
 
 namespace NeuralBotLibTests {
     public class NeuralNetworkTests {
+        #region Neural.IsJagged
         [Fact]
-        public void NNEvalOnEmptyWeightArray() {
-            double[][][] ws = new double[][][] {
-
-            };
-            double[] inputs = new double[] { 1, 2, 3 };
-            double[] output = NeuralNetwork.NNEval(ws, inputs);
-
-            Assert.Equal(0, output.Length);
-        }
-
-        [Fact]
-        public void NeuronLayerEval_Null_Handling() {
-            Assert.Throws<ArgumentNullException>(() => NeuralNetwork.NeuronLayerEval(x => x, null, null));
-            Assert.Throws<ArgumentNullException>(() => NeuralNetwork.NeuronLayerEval(x => x, null, new double[] { }));
-            Assert.Throws<ArgumentNullException>(() => NeuralNetwork.NeuronLayerEval(x => x, new double[][] { }, null));
-            Assert.Throws<ArgumentNullException>(() => NeuralNetwork.NeuronLayerEval(null, new double[][] { }, new double[] { }));
-        }
-
-        //[Property]
-        //public Property NeuronLayerEval_Error_Handling() {
-        //    return Prop.ForAll<double[][], double[]>((wss, ins) => {
-        //        Action lazy = () => NeuralNetwork.NeuronLayerEval(x => x, wss, ins);
-        //        if (wss[0].Length == 0) Assert.Throws<NeuralNetwork.EmptyWeightsException>(lazy);
-        //        else if (wss[0].Length > ins.Length + 1) Assert.Throws<NeuralNetwork.ExcessiveWeightsException>(lazy);
-        //        else if (ins.Length + 1 > wss.GetLength(1)) Assert.Throws<NeuralNetwork.ExcessiveInputsException>(lazy);
-        //        else {
-        //            double[] output = NeuralNetwork.NeuronLayerEval(x => x, wss, ins);
-        //            Assert.True(output.Length == wss.GetLength(0),
-        //                $"output.Length={output.Length}, wss.GetLength(0)={wss.GetLength(0)}");
-        //        }
-        //    });
-        //}
-
-        [Fact]
-        public void NeuronLayerEval_With_TestData() {
-            double[][] wss0 = new double[][] { new double[] { 1 } };
-            double[] ins0 = new double[] { };
-            List<double> out0 = new List<double> { 1 };
-
-            double[][] wss1 = new double[][] { new double[] { -10, 2.01 } };
-            double[] ins1 = new double[] { 0.57 };
-            List<double> out1 = new List<double> { -10 * 0.57 + 2.01 };
-
-            double[][] wss2 = new double[][] {
-                new double[] { 17, 0.112, -81 },
-                new double[] { 10, -2.9, 3.1 }
-            };
-            double[] ins2 = new double[] { 0.22, 5.01 };
-            List<double> out2 = new List<double> {
-                17 * 0.22 + 0.112 * 5.01 - 81,
-                10 * 0.22 - 2.9 * 5.01 + 3.1
+        public void IsJagged_With_Jagged_Testdata() {
+            double[][] arrays0 = new double[][] {
+                new double[] { },
+                new double[] { 0 }
             };
 
-            double[][] wss3 = new double[][] {
-                new double[] { 8, 2.3, 4,   9,   9,   3 },
-                new double[] { 1, 2,   9.8, 1,   2,   1.1 },
-                new double[] { 4, 3,   8,   3,   4,   9 },
-                new double[] { 3, 2,   3,   5,   2,   0 },
-                new double[] { 8, 2,   7.8, 4.2, 3.8, 9 }
-            };
-            double[] ins3 = new double[] { 7, 28, 2, 8, 2 };
-            List<double> out3 = new List<double> {
-                8 * 7 + 2.3 * 28 + 4   * 2 + 9   * 8 + 9 *   2 + 3,
-                1 * 7 + 2   * 28 + 9.8 * 2 + 1   * 8 + 2 *   2 + 1.1,
-                4 * 7 + 3   * 28 + 8   * 2 + 3   * 8 + 4 *   2 + 9,
-                3 * 7 + 2   * 28 + 3   * 2 + 5   * 8 + 2 *   2 + 0,
-                8 * 7 + 2   * 28 + 7.8 * 2 + 4.2 * 8 + 3.8 * 2 + 9
+            double[][] arrays1 = new double[][] {
+                new double[] { 0, 0 },
+                new double[] { 0 }
             };
 
-            Func<double, double> fa = x => x;
-            Func<double, double> fb = x => x * 3;
-            Func<double, double> fc = x => x - 10;
+            double[][] arrays2 = new double[][] {
+                new double[] { 0, 0 },
+                new double[] { 0, 0 },
+                new double[] { 0, 0, 0 },
+                new double[] { 0, 0 },
+                new double[] { 0, 0 }
+            };
 
-            Assert.Equal(out0.Select(fa).ToArray(), NeuralNetwork.NeuronLayerEval(fa, wss0, ins0));
-            Assert.Equal(out0.Select(fb).ToArray(), NeuralNetwork.NeuronLayerEval(fb, wss0, ins0));
-            Assert.Equal(out0.Select(fc).ToArray(), NeuralNetwork.NeuronLayerEval(fc, wss0, ins0));
+            double[][] arrays3 = new double[][] {
+                new double[] { 0, 0, 0 },
+                new double[] { 0, 0, 0 },
+                new double[] { 0, 0, 0 },
+                new double[] { 0, 0, 0 },
+                new double[] { 0, 0 }
+            };
 
-            Assert.Equal(out1.Select(fa).ToArray(), NeuralNetwork.NeuronLayerEval(fa, wss1, ins1));
-            Assert.Equal(out1.Select(fb).ToArray(), NeuralNetwork.NeuronLayerEval(fb, wss1, ins1));
-            Assert.Equal(out1.Select(fc).ToArray(), NeuralNetwork.NeuronLayerEval(fc, wss1, ins1));
+            double[][] arrays4 = new double[][] {
+                new double[] { 0, 0, 0, 0 },
+                new double[] { 0, 0, 0, 0 },
+                new double[] { 0, 0, 0, 0 },
+                new double[] { },
+                new double[] { 0, 0, 0, 0 }
+            };
 
-            Assert.Equal(out2.Select(fa).ToArray(), NeuralNetwork.NeuronLayerEval(fa, wss2, ins2));
-            Assert.Equal(out2.Select(fb).ToArray(), NeuralNetwork.NeuronLayerEval(fb, wss2, ins2));
-            Assert.Equal(out2.Select(fc).ToArray(), NeuralNetwork.NeuronLayerEval(fc, wss2, ins2));
-
-            Assert.Equal(out3.Select(fa).ToArray(), NeuralNetwork.NeuronLayerEval(fa, wss3, ins3));
-            Assert.Equal(out3.Select(fb).ToArray(), NeuralNetwork.NeuronLayerEval(fb, wss3, ins3));
-            Assert.Equal(out3.Select(fc).ToArray(), NeuralNetwork.NeuronLayerEval(fc, wss3, ins3));
-        }
-
-        #region NeuronTests
-        [Theory]
-        [InlineData(null, null)]
-        [InlineData(new double[] { }, null)]
-        [InlineData(null, new double[] { })]
-        public void NeuronEval_Throws_ArgumentNullException_On_Null_Arguments(double[] weights, double[] inputs) {
-            Assert.Throws<ArgumentNullException>(() => NeuralNetwork.NeuronEval(x => x, weights, inputs));
+            Assert.True(Neural.IsJagged(arrays0));
+            Assert.True(Neural.IsJagged(arrays1));
+            Assert.True(Neural.IsJagged(arrays2));
+            Assert.True(Neural.IsJagged(arrays3));
+            Assert.True(Neural.IsJagged(arrays4));
         }
 
         [Fact]
-        public void NeuronEval_Throws_ArgumentNullException_On_Null_Activation() {
-            Assert.Throws<ArgumentNullException>(() => NeuralNetwork.NeuronEval(null, new double[] { }, new double[] { }));
-        }
+        public void IsJagged_With_Nonjagged_Testdata() {
+            double[][] arrays0 = new double[][] { };
+            double[][] arrays1 = new double[][] {
+                new double[] { }
+            };
 
-        [Property]
-        public Property NeuronEval_Error_Handling() {
-            return Prop.ForAll<double[], double[]>((weights, inputs) => {
-                Action lazy = () => NeuralNetwork.NeuronEval(NeuralNetwork.Sigmoid, weights, inputs);
-                if (weights.Length == 0) Assert.Throws<NeuralNetwork.EmptyWeightsException>(lazy);
-                else if (weights.Length > inputs.Length + 1) Assert.Throws<NeuralNetwork.ExcessiveWeightsException>(lazy);
-                else if (inputs.Length + 1 > weights.Length) Assert.Throws<NeuralNetwork.ExcessiveInputsException>(lazy);
-            });
-        }
+            double[][] arrays2 = new double[][] {
+                new double[] { 0 }
+            };
 
-        [Theory]
-        [InlineData(new double[] { 7 }, new double[] { }, 7)]
-        [InlineData(new double[] { -8 }, new double[] { }, -8)]
-        [InlineData(new double[] { 4.01, 2.005 }, new double[] { 9.5 },
-            4.01 * 9.5 + 2.005)]
-        [InlineData(new double[] { 2, 2, 3 }, new double[] { 5, 2 },
-            2 * 5 + 2 * 2 + 3)]
-        [InlineData(new double[] { 83, -2, 74 }, new double[] { 19, 21 },
-            83 * 19 - 2 * 21 + 74)]
-        [InlineData(new double[] { 0.12, 0.32, 4, -3.2 }, new double[] { 19, 21, -0.8 },
-            0.12 * 19 + 0.32 * 21 - 4 * 0.8 - 3.2)]
-        [InlineData(new double[] { 0.989, 0.343, 9, -2 }, new double[] { 12, -9, -0.81 },
-            0.989 * 12 - 0.343 * 9 - 9 * 0.81 - 2)]
-        public void NeuronEval__With_TestData(double[] weights, double[] inputs, double inputsdotweights) {
-            Func<double, double> a0 = x => x;
-            Func<double, double> a1 = x => x * 2;
-            Func<double, double> a2 = x => x * x;
-            Func<double, double> a3 = x => x * x + 3 * x - 7;
-            double output0 = NeuralNetwork.NeuronEval(a0, weights, inputs);
-            double output1 = NeuralNetwork.NeuronEval(a1, weights, inputs);
-            double output2 = NeuralNetwork.NeuronEval(a2, weights, inputs);
-            double output3 = NeuralNetwork.NeuronEval(a3, weights, inputs);
-            Assert.Equal(a0(inputsdotweights), output0);
-            Assert.Equal(a1(inputsdotweights), output1);
-            Assert.Equal(a2(inputsdotweights), output2);
-            Assert.Equal(a3(inputsdotweights), output3);
+            double[][] arrays3 = new double[][] {
+                new double[] { },
+                new double[] { }
+            };
+
+            double[][] arrays4 = new double[][] {
+                new double[] { 0, 0 },
+                new double[] { 0, 0 }
+            };
+
+            double[][] arrays5 = new double[][] {
+                new double[] { 0, 0, 0 },
+                new double[] { 0, 0, 0 },
+                new double[] { 0, 0, 0 },
+                new double[] { 0, 0, 0 },
+                new double[] { 0, 0, 0 }
+            };
+
+            double[][] arrays6 = new double[][] {
+                new double[] { 0, 0 },
+                new double[] { 0, 0 },
+                new double[] { 0, 0 },
+                new double[] { 0, 0 }
+            };
+
+            double[][] arrays7 = new double[][] {
+                new double[] { 0, 0, 0, 0 },
+                new double[] { 0, 0, 0, 0 },
+                new double[] { 0, 0, 0, 0 },
+                new double[] { 0, 0, 0, 0 },
+                new double[] { 0, 0, 0, 0 }
+            };
+
+            double[][] arrays8 = new double[][] {
+                new double[] { 0 },
+                new double[] { 0 },
+                new double[] { 0 },
+                new double[] { 0 },
+                new double[] { 0 }
+            };
+
+            Assert.False(Neural.IsJagged(arrays0));
+            Assert.False(Neural.IsJagged(arrays1));
+            Assert.False(Neural.IsJagged(arrays2));
+            Assert.False(Neural.IsJagged(arrays3));
+            Assert.False(Neural.IsJagged(arrays4));
+            Assert.False(Neural.IsJagged(arrays5));
+            Assert.False(Neural.IsJagged(arrays6));
+            Assert.False(Neural.IsJagged(arrays7));
+            Assert.False(Neural.IsJagged(arrays8));
         }
         #endregion
-        #region SigmoidTests
-        [Property]
-        public Property Sigmoid_PropTest() {
-            return Prop.ForAll<double>(x => {
-                if (x.Equals(double.NaN))
-                    Assert.Throws<ArgumentOutOfRangeException>(() => NeuralNetwork.Sigmoid(double.NaN));
-                else {
-                    double h = 0.001;
-                    double y0 = NeuralNetwork.Sigmoid(x);
-                    double y1 = NeuralNetwork.Sigmoid(x >= 0 ? x + h : x - h);
-                    double y2 = NeuralNetwork.Sigmoid(x >= 0 ? x + 2 * h : x - 2 * h);
-                    double d1 = y1 - y0;
-                    double d2 = y2 - y1;
-                    if (x >= 0 && x <= 10)
-                        Assert.True(y0 >= 0.5 && y0 <= 1 && d1 > d2 && d1 > 0,
-                            $"if(x >= 0 && x <= 10): y0={y0}, d1={d1}, d2={d2}");
-                    else if (x < 0 && x >= -10)
-                        Assert.True(y0 < 0.5 && y0 >= 0 && d1 < d2 && d1 < 0,
-                            $"if(x < 0 && x >= -10): y0={y0}, d1={d1}, d2={d2}");
-                    else if (x > 10)
-                        Assert.True(y0 == 1 && d1 == 0 && d2 == 0,
-                            $"if(x > 10): y0={y0}, d1={d1}, d2={d2}");
-                    else if (x < -10)
-                        Assert.True(y0 == 0 && d1 == 0 && d2 == 0,
-                            $"if(x < -10): y0={y0}, d1={d1}, d2={d2}");
-                    else Assert.True(false);
+
+        #region Neural.Validation
+        [Fact]
+        public void Validation_With_Invalid_Testdata() {
+            double[] ins0 = new double[] { };
+            double[][][] wsss0 = new double[][][] { };
+
+            double[] ins1 = new double[] { };
+            double[][][] wsss1 = new double[][][] {
+                new double[][] { new double[] { 0, 0 } }
+            };
+
+            double[] ins2 = new double[] { };
+            double[][][] wsss2 = new double[][][] {
+                new double[][] {
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, }
                 }
-            });
+            };
+
+            double[] ins3 = new double[] { 0, 0 };
+            double[][][] wsss3 = new double[][][] {
+                new double[][] {
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, }
+                }
+            };
+
+            double[] ins4 = new double[] { 0, 0, 0 };
+            double[][][] wsss4 = new double[][][] {
+                new double[][] {
+                    new double[] { 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, 0 }
+                }
+            };
+
+            double[] ins5 = new double[] { 0, 0 };
+            double[][][] wsss5 = new double[][][] {
+                new double[][] {
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0 }
+                }
+            };
+
+            Assert.False(Neural.Validation(wsss0, ins0));
+            Assert.False(Neural.Validation(wsss1, ins1));
+            Assert.False(Neural.Validation(wsss2, ins2));
+            Assert.False(Neural.Validation(wsss3, ins3));
+            Assert.False(Neural.Validation(wsss4, ins4));
+            Assert.False(Neural.Validation(wsss5, ins5));
+        }
+
+        [Fact]
+        public void Validation_With_Valid_Testdata() {
+            double[] ins0 = new double[] { };
+            double[][][] wsss0 = new double[][][] {
+                new double[][] { new double[] { 0 } }
+            };
+
+            double[] ins1 = new double[] { 0 };
+            double[][][] wsss1 = new double[][][] {
+                new double[][] { new double[] { 0, 0 } }
+            };
+
+            double[] ins2 = new double[] { 0 };
+            double[][][] wsss2 = new double[][][] {
+                new double[][] {
+                    new double[] { 0, 0 },
+                    new double[] { 0, 0 }
+                }
+            };
+
+            double[] ins3 = new double[] { 0, 0 };
+            double[][][] wsss3 = new double[][][] {
+                new double[][] {
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0, 0 }
+                }
+            };
+
+            double[] ins4 = new double[] { 0, 0, 0 };
+            double[][][] wsss4 = new double[][][] {
+                new double[][] {
+                    new double[] { 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0 },
+                    new double[] { 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0 },
+                    new double[] { 0, 0 },
+                    new double[] { 0, 0 },
+                    new double[] { 0, 0 },
+                    new double[] { 0, 0 },
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0, 0, 0 },
+                    new double[] { 0, 0, 0, 0, 0, 0 }
+                },
+                new double[][] {
+                    new double[] { 0, 0, 0, 0, 0 }
+                }
+            };
+
+            Assert.True(Neural.Validation(wsss0, ins0));
+            Assert.True(Neural.Validation(wsss1, ins1));
+            Assert.True(Neural.Validation(wsss2, ins2));
+            Assert.True(Neural.Validation(wsss3, ins3));
+            Assert.True(Neural.Validation(wsss4, ins4));
+        }
+        #endregion
+
+        #region Neural.Neuron
+        [Theory]
+        [InlineData(new double[] { 7 }, new double[] { },
+            7)]
+        [InlineData(new double[] { 9, 2 }, new double[] { },
+            9 * 0 + 2)]
+        [InlineData(new double[] { 1, 2 }, new double[] { 1, 7 },
+            1 * 1 + 2 * 7 + 2)]
+        [InlineData(new double[] { double.NaN, 1 }, new double[] { 5, 2.3 },
+            double.NaN)]
+        [InlineData(new double[] { 11 }, new double[] { 8, 8 },
+            11 * 8 + 11)]
+        [InlineData(new double[] { 2, 3.97, 2.01, 9.38 }, new double[] { 7.2, -0.81, 9.1 },
+            2 * 7.2 - 3.97 * 0.81 + 2.01 * 9.1 + 9.38)]
+        public void Neuron_With_Valid_Testdata(double[] ws, double[] ins, double output) {
+            Func<double, double> a0 = x => x;
+            Func<double, double> a1 = x => x * 2;
+            Func<double, double> a2 = x => x - 10;
+            Func<double, double> a3 = x => x * x - x * 4 + 23;
+            Assert.Equal(a0(output), Neural.Neuron(a0, ws, ins));
+            Assert.Equal(a1(output), Neural.Neuron(a1, ws, ins));
+            Assert.Equal(a2(output), Neural.Neuron(a2, ws, ins));
+            Assert.Equal(a3(output), Neural.Neuron(a3, ws, ins));
+        }
+
+        [Theory]
+        [InlineData(null, null)]
+        [InlineData(new double[] { 1.29, 4.8, 1.2 }, null)]
+        [InlineData(null, new double[] { 2.93, 8, 2.8, 9.3 })]
+        public void Neuron_With_Null_Arguments(double[] ws, double[] ins) {
+            Assert.Throws<ArgumentNullException>(() => Neural.Neuron(x => x, ws, ins));
+        }
+        #endregion
+
+        #region Neural.Layer
+        [Fact]
+        public void Layer_With_Valid_TestData() {
+            double[] ins0 = new double[] { };
+            double[][] wss0 = new double[][] { };
+            double[] output0 = new double[] { };
+
+            double[] ins1 = new double[] { 1, 29, 19, 4 };
+            double[][] wss1 = new double[][] { new double[] { 23, 2, 3, 899 } };
+            double[] output1 = new double[] { 1 * 23 + 29 * 2 + 19 * 3 + 4 * 899 + 899 };
+
+            double[] ins2 = new double[] { -9, 3.4, 7, 8.94, 3 };
+            double[][] wss2 = new double[][] {
+                new double[] { 2.03, 9,   8, 40.9, 0.2,   -3 },
+                new double[] {  1.2, 1,  -9,    8,   0,  1.2 },
+                new double[] {   -9, 2, 3.9,  2.8,  -8,  9.2 },
+                new double[] {  3.2, 8,   9,  2.3,   9, 8.29 }
+            };
+            double[] output2 = new double[] {
+                -9*2.03 + 3.4*9 + 7*8   + 8.94*40.9 + 3*0.2 - 3,
+                -9*1.2  + 3.4*1 - 7*9   + 8.94*8    + 3*0   + 1.2,
+                 9*9    + 3.4*2 + 7*3.9 + 8.94*2.8  - 3*8   + 9.2,
+                -9*3.2  + 3.4*8 + 7*9   + 8.94*2.3  + 3*9   + 8.29
+            };
+
+            Assert.Equal(output0.Select(x => x).ToArray(), Neural.Layer(x => x, wss0, ins0));
+            Assert.Equal(output1.Select(x => x).ToArray(), Neural.Layer(x => x, wss1, ins1));
+            Assert.Equal(output2.Select(x => x).ToArray(), Neural.Layer(x => x, wss2, ins2));
+
+            Assert.Equal(output0.Select(x => x * 5).ToArray(), Neural.Layer(x => x * 5, wss0, ins0));
+            Assert.Equal(output1.Select(x => x * 5).ToArray(), Neural.Layer(x => x * 5, wss1, ins1));
+            Assert.Equal(output2.Select(x => x * 5).ToArray(), Neural.Layer(x => x * 5, wss2, ins2));
+
+            Assert.Equal(output0.Select(x => x * x + x - 10).ToArray(), Neural.Layer(x => x * x + x - 10, wss0, ins0));
+            Assert.Equal(output1.Select(x => x * x + x - 10).ToArray(), Neural.Layer(x => x * x + x - 10, wss1, ins1));
+            Assert.Equal(output2.Select(x => x * x + x - 10).ToArray(), Neural.Layer(x => x * x + x - 10, wss2, ins2));
+        }
+
+        [Fact]
+        public void Layer_With_Null_Arguments() {
+            Assert.Throws<ArgumentNullException>(() => Neural.Layer(x => x, null, null));
+            //Assert.Throws<ArgumentNullException>(() => Neural.Layer(x => x, new double[][] { }, null));
+            Assert.Throws<ArgumentNullException>(() => Neural.Layer(x => x, null, new double[] { }));
+        }
+        #endregion
+
+        #region Neural.Network
+        [Fact]
+        public void Network_With_Test_Data() {
+            double[] ins = new double[] { 2.3, 4.8, 9.2 };
+            double[][][] wsss = new double[][][] {
+                new double[][] {
+                    new double[] { 1.2, 0.8, 9.1, 2.9 },
+                    new double[] { 9.3, 4.7, 8.3, 7.4 },
+                    new double[] { 2.9, 3.8, 5.8, 9.2 }
+                },
+                new double[][] {
+                    new double[] { 6.3, 5.6, 3.4, 4.3 },
+                    new double[] { 3.4, 3.4, 5.6, 6.7 }
+                }
+            };
+
+            Func<double, double> fa = x => x * x;
+            Func<double, double> fb = x => x * 3;
+
+            double n00a = fa(2.3 * 1.2 + 4.8 * 0.8 + 9.2 * 9.1 + 2.9);
+            double n01a = fa(2.3 * 9.3 + 4.8 * 4.7 + 9.2 * 8.3 + 7.4);
+            double n02a = fa(2.3 * 2.9 + 4.8 * 3.8 + 9.2 * 5.8 + 9.2);
+
+            double n00b = fb(2.3 * 1.2 + 4.8 * 0.8 + 9.2 * 9.1 + 2.9);
+            double n01b = fb(2.3 * 9.3 + 4.8 * 4.7 + 9.2 * 8.3 + 7.4);
+            double n02b = fb(2.3 * 2.9 + 4.8 * 3.8 + 9.2 * 5.8 + 9.2);
+
+            double n10a = fa(n00a * 6.3 + n01a * 5.6 + n02a * 3.4 + 4.3);
+            double n11a = fa(n00a * 3.4 + n01a * 3.4 + n02a * 5.6 + 6.7);
+
+            double n10b = fb(n00b * 6.3 + n01b * 5.6 + n02b * 3.4 + 4.3);
+            double n11b = fb(n00b * 3.4 + n01b * 3.4 + n02b * 5.6 + 6.7);
+
+            double[] outputa = new double[] { n10a, n11a };
+            double[] outputb = new double[] { n10b, n11b };
+
+            Assert.Equal(outputa, Neural.Network(fa, wsss, ins));
+            Assert.Equal(outputb, Neural.Network(fb, wsss, ins));
         }
         #endregion
     }
