@@ -78,11 +78,11 @@ namespace NeuralBotLib {
             };
         }
 
-        public static Func<int, int> GenMutator(int seed) {
+        public static Func<Gene, Gene> GenMutator(int seed) {
             int rnd = hash(seed);
             return x => {
                 rnd = hash(rnd);
-                return x ^ (1 << (rnd % 32));
+                return new Gene(x.Data ^ (1 << (rnd % 32)));
             };
         }
         #endregion

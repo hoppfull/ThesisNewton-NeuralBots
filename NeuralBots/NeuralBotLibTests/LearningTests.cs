@@ -34,9 +34,15 @@ namespace NeuralBotLibTests {
                 (Math.Pow(8 - 2, 2) + Math.Pow(4 - 3, 2) + Math.Pow(6 - 4, 2) + Math.Pow(4 - 2, 2)) +
                 (Math.Pow(5 - 1, 2) + Math.Pow(4 - 5, 2) + Math.Pow(7 - 2, 2) + Math.Pow(4 - 3, 2));
 
+            Learning.TrainingExample[] ex3 = new Learning.TrainingExample[] {
+                new Learning.TrainingExample(new double[] { 9.234 }, new double[] { 4.5443 })
+            };
+            double expected3 = Math.Pow(4.5443 - 9.234, 2);
+
             Assert.Equal(expected0, Learning.Cost(ex0, xs => xs));
             Assert.Equal(expected1, Learning.Cost(ex1, xs => xs));
             Assert.Equal(expected2, Learning.Cost(ex2, xs => xs));
+            Assert.Equal(expected3, Learning.Cost(ex3, xs => xs));
         }
         #endregion
     }
