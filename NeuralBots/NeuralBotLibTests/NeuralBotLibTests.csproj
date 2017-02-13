@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GeneticsTests.cs" />
+    <Compile Include="LearningTests.cs" />
     <Compile Include="NeuralNetworkTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

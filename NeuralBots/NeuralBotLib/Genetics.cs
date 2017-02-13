@@ -1,21 +1,42 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 // http://derekwill.com/2015/03/05/bit-processing-in-c/
 namespace NeuralBotLib {
     public static class Genetics {
+        public class Gene {
+            public int Data { get; }
+            public Gene(int Data) { this.Data = Data; }
+        }
+
+        public class Chromosome {
+            public Gene[] Genes { get; }
+            public uint[] Config { get; }
+            public Chromosome(Func<Gene> gene, uint[] Config) {
+                this.Config = Config;
+                Genes = new int[LengthOfGenes(Config)].Select(_ => gene()).ToArray();
+            }
+
+            public Chromosome(Gene[] Genes, uint[] Config) {
+                this.Config = Config;
+                this.Genes = Genes;
+            }
+
+            public Chromosome Replicate(Func<Gene, Gene> mutate) {
+                return new Chromosome(Genes.Select(mutate).ToArray(), Config);
+            }
+
+            public double[] ExpressWith(Chromosome chromosome, Func<Gene, Gene, double> expressGene) {
+                double[] result = new double[Math.Min(Genes.Length, chromosome.Genes.Length)];
+                for (int i = 0; i < result.Length; i++) result[i] = expressGene(Genes[i], chromosome.Genes[i]);
+                return result;
+            }
+        }
+
         private static uint LengthOfGenes(uint[] config) {
             uint result = 0;
             for (int i = 1; i < config.Length; i++) result += (config[i - 1] + 1) * config[i];
             return result;
-        }
-
-        public static int[] Genesis(Func<int> gene, uint[] config) {
-            return new int[LengthOfGenes(config)].Select(_ => gene()).ToArray();
         }
 
         public static double[][][] FoldExpression(double[] geneExpression, uint[] config) {
@@ -30,14 +51,6 @@ namespace NeuralBotLib {
                 }
             }
             return result;
-        }
-
-        public static double[] ExpressGenes(Func<int, int, double> expressGene, int[] chrA, int[] chrB) {
-            return chrA.Zip(chrB, expressGene).ToArray();
-        }
-
-        public static int[] Replicate(int[] chromosome, Func<int, int> mutation) {
-            return chromosome.Select(mutation).ToArray();
         }
 
         #region rand functions

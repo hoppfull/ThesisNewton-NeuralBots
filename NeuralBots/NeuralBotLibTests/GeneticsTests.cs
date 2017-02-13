@@ -11,30 +11,30 @@ using NeuralBotLib;
 
 namespace NeuralBotLibTests {
     public class GeneticsTests {
-        #region Genetics.Genesis
+        #region Genetics.Chromosome (Genesis)
         [Theory]
         [InlineData(new uint[] { }, 0)]
         [InlineData(new uint[] { 74 }, 0)]
         [InlineData(new uint[] { 3, 4 }, (3 + 1) * 4)]
         [InlineData(new uint[] { 2, 3, 8, 7, 4, 6 },
             (2 + 1) * 3 + (3 + 1) * 8 + (8 + 1) * 7 + (7 + 1) * 4 + (4 + 1) * 6)]
-        public void Genesis_With_Testdata(uint[] config, int length) {
-            Func<int> fa = () => 0;
-            Func<int> fb = () => 1;
-            Func<int> fc = Genetics.GenHasher(234232, 123121);
-            Func<int> fd = Genetics.GenHasher(234232, 123121);
+        public void Chromosome_For_Genesis_With_Testdata(uint[] config, int length) {
+            Func<Genetics.Gene> fa = () => new Genetics.Gene(0);
+            Func<Genetics.Gene> fb = () => new Genetics.Gene(1);
+            Func<Genetics.Gene> fc = () => new Genetics.Gene(Genetics.GenHasher(234232, 123121)());
+            Func<Genetics.Gene> fd = () => new Genetics.Gene(Genetics.GenHasher(234232, 123121)());
 
-            int[] chromosomeA = Genetics.Genesis(fa, config);
-            int[] chromosomeB = Genetics.Genesis(fb, config);
-            int[] chromosomeC = Genetics.Genesis(fc, config);
+            Genetics.Chromosome cA = new Genetics.Chromosome(fa, config);
+            Genetics.Chromosome cB = new Genetics.Chromosome(fb, config);
+            Genetics.Chromosome cC = new Genetics.Chromosome(fc, config);
 
-            Assert.Equal(length, chromosomeA.Length);
-            Assert.Equal(length, chromosomeB.Length);
-            Assert.Equal(length, chromosomeC.Length);
+            Assert.Equal(length, cA.Genes.Length);
+            Assert.Equal(length, cB.Genes.Length);
+            Assert.Equal(length, cC.Genes.Length);
 
-            Assert.True(chromosomeA.All(gene => gene == 0), "All zero");
-            Assert.True(chromosomeB.All(gene => gene == 1), "All one");
-            Assert.True(chromosomeC.All(gene => gene == fd()), "All random");
+            Assert.True(cA.Genes.All(gene => gene.Data == 0), "All zero");
+            Assert.True(cB.Genes.All(gene => gene.Data == 1), "All one");
+            Assert.True(cC.Genes.All(gene => gene.Data == fd().Data), "All random");
         }
         #endregion
 

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Genetics.cs" />
+    <Compile Include="Learning.cs" />
     <Compile Include="Neural.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
