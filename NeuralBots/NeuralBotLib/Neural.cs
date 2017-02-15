@@ -44,6 +44,21 @@ namespace NeuralBotLib {
             }
             return true;
         }
+
+        public static double[][][] FoldExpression(double[] geneExpression, uint[] config) {
+            double[][][] result = new double[Math.Max(config.Length - 1, 0)][][];
+            int gene = 0;
+            for (int i = 0; i < result.Length; i++) {
+                result[i] = new double[config[i + 1]][];
+                for (int j = 0; j < result[i].Length; j++) {
+                    int nWeights = (int)config[i] + 1;
+                    result[i][j] = geneExpression.Skip(gene).Take(nWeights).ToArray();
+                    gene += nWeights;
+                }
+            }
+            return result;
+        }
+
         #endregion
     }
 }

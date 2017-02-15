@@ -390,5 +390,25 @@ namespace NeuralBotLibTests {
             Assert.Equal(outputb, Neural.Network(fb, wsss, ins));
         }
         #endregion
+
+        #region Genetics.FoldExpression
+        [Theory]
+        [InlineData(new double[] { }, new uint[] { }, 0)]
+        [InlineData(new double[] { }, new uint[] { 3 }, 0)]
+        [InlineData(new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+            new uint[] { 2, 3 }, 1)]
+        [InlineData(new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 },
+            new uint[] { 3, 3, 1, 2, 4 }, 4)]
+        public void FoldExpression_With_Testdata(double[] expressedGenes, uint[] config, int wsssLength) {
+            double[][][] wsss = Neural.FoldExpression(expressedGenes, config);
+
+            Assert.Equal(wsssLength, wsss.Length);
+            for (int i = 0; i < wsssLength; i++) {
+                Assert.Equal((int)config[i + 1], wsss[i].Length);
+                for (int j = 0; j < wsss[i].Length; j++)
+                    Assert.Equal((int)config[i] + 1, wsss[i][j].Length);
+            }
+        }
+        #endregion
     }
 }
