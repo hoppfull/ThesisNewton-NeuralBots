@@ -12,10 +12,58 @@ using static NeuralBotLib.Genetics;
 
 namespace NeuralBotLibTests {
     public class GeneticsTests {
+        #region Individual
+
+        [Fact]
+        public void IndividualMate_With_Testdata() {
+            Func<int> fa = () => 0;
+            Individual ind1a = new Individual(fa,
+                new Chromosome(Generate(gene => gene, new Gene(1)).Take(3)),
+                new Chromosome(Generate(gene => gene, new Gene(2)).Take(3)));
+
+            Individual ind1b = new Individual(fa,
+                new Chromosome(Generate(gene => gene, new Gene(3)).Take(3)),
+                new Chromosome(Generate(gene => gene, new Gene(4)).Take(3)));
+
+            Func<int> fb = () => 1;
+            Individual ind2a = new Individual(fb,
+                new Chromosome(Generate(gene => gene, new Gene(1)).Take(3)),
+                new Chromosome(Generate(gene => gene, new Gene(2)).Take(3)));
+
+            Individual ind2b = new Individual(fb,
+                new Chromosome(Generate(gene => gene, new Gene(3)).Take(3)),
+                new Chromosome(Generate(gene => gene, new Gene(4)).Take(3)));
+
+            Individual ind1ab = ind1a.Mate(ind1b, gene => new Gene(gene.Data * 10));
+            Individual ind2ab = ind2a.Mate(ind2b, gene => new Gene(gene.Data * 10));
+
+            Assert.True(ind1ab.cA.Genes.All(gene => gene.Data == 10), "gene.Data = 10");
+            Assert.True(ind1ab.cB.Genes.All(gene => gene.Data == 30), "gene.Data = 30");
+
+            Assert.True(ind2ab.cA.Genes.All(gene => gene.Data == 20), "gene.Data = 20");
+            Assert.True(ind2ab.cB.Genes.All(gene => gene.Data == 40), "gene.Data = 40");
+        }
+
+        [Fact]
+        public void IndividualExpress_With_Testdata() {
+            Individual ind1a = new Individual(() => 0,
+                new Chromosome(Generate(gene => gene, new Gene(6)).Take(3)),
+                new Chromosome(Generate(gene => gene, new Gene(4)).Take(3)));
+
+            Func<Gene, Gene, double> fa = (gA, gB) => gA.Data + gB.Data;
+            Func<Gene, Gene, double> fb = (gA, gB) => gA.Data * gB.Data;
+            Func<Gene, Gene, double> fc = (gA, gB) => gA.Data / gB.Data;
+
+            Assert.True(ind1a.Express(fa).All(d => d == 6 + 4), "d = 6 + 4");
+            Assert.True(ind1a.Express(fb).All(d => d == 6 * 4), "d = 6 * 4");
+            Assert.True(ind1a.Express(fc).All(d => d == 6 / 4), "d = 6 / 4");
+        }
+
+        #endregion
         #region Chromosome
         [Fact]
         public void ChromosomeReplicate_Replicates_As_Intended() {
-            Chromosome c1 = new Chromosome(NumberGenerator(gene => gene, new Gene(0)).Take(5));
+            Chromosome c1 = new Chromosome(Generate(gene => gene, new Gene(0)).Take(5));
             Chromosome c2 = c1.Replicate(gene => new Gene(gene.Data + 1));
             Gene[] g1 = c1.Genes.ToArray();
             Gene[] g2 = c2.Genes.ToArray();
@@ -103,15 +151,15 @@ namespace NeuralBotLibTests {
         public Property NumberGenerator_Is_Deterministic() {
             return Prop.ForAll<int, int>((length, seed) => {
                 Assert.Equal(
-                    NumberGenerator(x => x, seed).Take(length),
-                    NumberGenerator(x => x, seed).Take(length));
+                    Generate(x => x, seed).Take(length),
+                    Generate(x => x, seed).Take(length));
             });
         }
 
         [Property]
         public Property NumberGenerator_Is_Pure() {
             return Prop.ForAll<int, int>((length, seed) => {
-                IEnumerable<int> list = NumberGenerator(Fastrand, seed).Take(length);
+                IEnumerable<int> list = Generate(Fastrand, seed).Take(length);
                 Assert.Equal(list.ToArray(), list.ToArray());
             });
         }
@@ -123,10 +171,10 @@ namespace NeuralBotLibTests {
             Func<double, double> f3 = x => 2 * x;
             Func<Tuple<int, bool>, Tuple<int, bool>> f4 = x => Tuple.Create(x.Item1 - 1, !x.Item2);
 
-            int[] result1 = NumberGenerator(f1, 0).Take(5).ToArray();
-            bool[] result2 = NumberGenerator(f2, true).Take(5).ToArray();
-            double[] result3 = NumberGenerator(f3, 0.1).Take(5).ToArray();
-            Tuple<int, bool>[] result4 = NumberGenerator(f4, Tuple.Create(10, false)).Take(5).ToArray();
+            int[] result1 = Generate(f1, 0).Take(5).ToArray();
+            bool[] result2 = Generate(f2, true).Take(5).ToArray();
+            double[] result3 = Generate(f3, 0.1).Take(5).ToArray();
+            Tuple<int, bool>[] result4 = Generate(f4, Tuple.Create(10, false)).Take(5).ToArray();
 
             Assert.Equal(new int[] { 1, 2, 3, 4, 5 }, result1);
             Assert.Equal(new bool[] { false, true, false, true, false }, result2);

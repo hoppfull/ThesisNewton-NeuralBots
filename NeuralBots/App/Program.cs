@@ -9,7 +9,6 @@ using NeuralBotLib;
 namespace App {
     class Program {
         static void Main(string[] args) {
-            Console.WriteLine(double.NaN >= double.NaN);
             //uint[] config = new uint[] { 2, 2, 1 };
             //Func<int> rng = Genetics.GenHasher(12346, 192379);
             //Individual[] currentGen = new Individual[10].Select(_ => {
@@ -69,32 +68,6 @@ namespace App {
 
             //}
             //Console.ReadKey();
-        }
-
-
-
-
-        class Individual {
-            public Genetics.Chromosome cA { get; }
-            public Genetics.Chromosome cB { get; }
-            private Func<int> rng;
-
-            public Individual(Func<int> rng, Genetics.Chromosome cA, Genetics.Chromosome cB) {
-                this.cA = cA;
-                this.cB = cB;
-                this.rng = rng;
-            }
-
-            public Individual Mate(Individual mate, Func<Genetics.Gene, Genetics.Gene> mutator) {
-                Genetics.Chromosome new_cA = (rng() % 2 == 0 ? cA : cB).Replicate(mutator);
-                Genetics.Chromosome new_cB = (rng() % 2 == 0 ? mate.cA : mate.cB).Replicate(mutator);
-                return new Individual(rng, new_cB, new_cA);
-            }
-
-            public double[] Express() {
-                return cA.ExpressWith(cB, (gA, gB) => (gA.Data + gB.Data) * 1.0e-5);
-            }
-
         }
     }
 }

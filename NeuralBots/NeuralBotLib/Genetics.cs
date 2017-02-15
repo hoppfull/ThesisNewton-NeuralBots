@@ -16,16 +16,38 @@ namespace NeuralBotLib {
                 this.Genes = Genes;
             }
 
-            public Chromosome Replicate(Func<Gene, Gene> mutate) {
-                return new Chromosome(Genes.Select(mutate));
+            public Chromosome Replicate(Func<Gene, Gene> mutator) {
+                return new Chromosome(Genes.Select(mutator));
             }
 
             public double[] ExpressWith(Chromosome chromosome, Func<Gene, Gene, double> expressGene) {
                 return Genes.Zip(chromosome.Genes, expressGene).ToArray();
             }
         }
-        
-        #region rand functions
+
+        public class Individual {
+            public Chromosome cA { get; }
+            public Chromosome cB { get; }
+            private Func<int> rng;
+
+            public Individual(Func<int> rng, Chromosome cA, Chromosome cB) {
+                this.cA = cA;
+                this.cB = cB;
+                this.rng = rng;
+            }
+
+            public Individual Mate(Individual mate, Func<Gene, Gene> mutator) {
+                Chromosome new_cA = (rng() % 2 == 0 ? cA : cB).Replicate(mutator);
+                Chromosome new_cB = (rng() % 2 == 0 ? mate.cA : mate.cB).Replicate(mutator);
+                return new Individual(rng, new_cA, new_cB);
+            }
+
+            public double[] Express(Func<Gene, Gene, double> expressGenes) {
+                return cA.ExpressWith(cB, expressGenes);
+            }
+        }
+
+        #region Utility functions
         public static int Fastrand(int seed) {
             return ((214013 * seed + 2531011) >> 16) & 0x7FFF;
         }
@@ -40,12 +62,16 @@ namespace NeuralBotLib {
             return x;
         }
         
-        public static IEnumerable<T> NumberGenerator<T>(Func<T, T> rng, T seed) {
-            T rn = rng(seed);
+        public static IEnumerable<T> Generate<T>(Func<T, T> generate, T seed) {
+            T rn = generate(seed);
             while (true) {
                 yield return rn;
-                rn = rng(rn);
+                rn = generate(rn);
             }
+        }
+
+        public static double DefaultGeneExpression(Gene geneA, Gene geneB) {
+            return (geneA.Data + geneB.Data) * 1.0e-5;
         }
         #endregion
     }
