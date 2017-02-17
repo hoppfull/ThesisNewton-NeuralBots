@@ -13,29 +13,28 @@ using static NeuralBotLib.Genetics;
 namespace NeuralBotLibTests {
     public class GeneticsTests {
         #region Individual
-
         [Fact]
         public void IndividualMate_With_Testdata() {
             Func<int> fa = () => 0;
-            Individual ind1a = new Individual(fa,
-                new Chromosome(Generate(gene => gene, new Gene(1)).Take(3)),
-                new Chromosome(Generate(gene => gene, new Gene(2)).Take(3)));
+            Individual ind1a = new Individual(
+                new Chromosome(Generate(gene => gene, new Gene(1)).Take(3).ToArray()),
+                new Chromosome(Generate(gene => gene, new Gene(2)).Take(3).ToArray()));
 
-            Individual ind1b = new Individual(fa,
-                new Chromosome(Generate(gene => gene, new Gene(3)).Take(3)),
-                new Chromosome(Generate(gene => gene, new Gene(4)).Take(3)));
+            Individual ind1b = new Individual(
+                new Chromosome(Generate(gene => gene, new Gene(3)).Take(3).ToArray()),
+                new Chromosome(Generate(gene => gene, new Gene(4)).Take(3).ToArray()));
 
             Func<int> fb = () => 1;
-            Individual ind2a = new Individual(fb,
-                new Chromosome(Generate(gene => gene, new Gene(1)).Take(3)),
-                new Chromosome(Generate(gene => gene, new Gene(2)).Take(3)));
+            Individual ind2a = new Individual(
+                new Chromosome(Generate(gene => gene, new Gene(1)).Take(3).ToArray()),
+                new Chromosome(Generate(gene => gene, new Gene(2)).Take(3).ToArray()));
 
-            Individual ind2b = new Individual(fb,
-                new Chromosome(Generate(gene => gene, new Gene(3)).Take(3)),
-                new Chromosome(Generate(gene => gene, new Gene(4)).Take(3)));
+            Individual ind2b = new Individual(
+                new Chromosome(Generate(gene => gene, new Gene(3)).Take(3).ToArray()),
+                new Chromosome(Generate(gene => gene, new Gene(4)).Take(3).ToArray()));
 
-            Individual ind1ab = ind1a.Mate(ind1b, gene => new Gene(gene.Data * 10));
-            Individual ind2ab = ind2a.Mate(ind2b, gene => new Gene(gene.Data * 10));
+            Individual ind1ab = ind1a.Mate(fa, ind1b, gene => new Gene(gene.Data * 10));
+            Individual ind2ab = ind2a.Mate(fb, ind2b, gene => new Gene(gene.Data * 10));
 
             Assert.True(ind1ab.cA.Genes.All(gene => gene.Data == 10), "gene.Data = 10");
             Assert.True(ind1ab.cB.Genes.All(gene => gene.Data == 30), "gene.Data = 30");
@@ -46,9 +45,9 @@ namespace NeuralBotLibTests {
 
         [Fact]
         public void IndividualExpress_With_Testdata() {
-            Individual ind1a = new Individual(() => 0,
-                new Chromosome(Generate(gene => gene, new Gene(6)).Take(3)),
-                new Chromosome(Generate(gene => gene, new Gene(4)).Take(3)));
+            Individual ind1a = new Individual(
+                new Chromosome(Generate(gene => gene, new Gene(6)).Take(3).ToArray()),
+                new Chromosome(Generate(gene => gene, new Gene(4)).Take(3).ToArray()));
 
             Func<Gene, Gene, double> fa = (gA, gB) => gA.Data + gB.Data;
             Func<Gene, Gene, double> fb = (gA, gB) => gA.Data * gB.Data;
@@ -63,7 +62,7 @@ namespace NeuralBotLibTests {
         #region Chromosome
         [Fact]
         public void ChromosomeReplicate_Replicates_As_Intended() {
-            Chromosome c1 = new Chromosome(Generate(gene => gene, new Gene(0)).Take(5));
+            Chromosome c1 = new Chromosome(Generate(gene => gene, new Gene(0)).Take(5).ToArray());
             Chromosome c2 = c1.Replicate(gene => new Gene(gene.Data + 1));
             Gene[] g1 = c1.Genes.ToArray();
             Gene[] g2 = c2.Genes.ToArray();

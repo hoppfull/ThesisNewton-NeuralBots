@@ -12,6 +12,17 @@ using NeuralBotLib;
 
 namespace NeuralBotLibTests {
     public class NeuralNetworkTests {
+        #region Neural.NWeightsFromConfig
+        [Theory]
+        [InlineData(new uint[] { }, 0)]
+        [InlineData(new uint[] { 0 }, 0)]
+        [InlineData(new uint[] { 5 }, 0)]
+        [InlineData(new uint[] { 2, 1, 2 }, (2 + 1) * 1 + (1 + 1) * 2)]
+        [InlineData(new uint[] { 3, 3, 4, 2, 1 }, (3 + 1) * 3 + (3 + 1) * 4 + (4 + 1) * 2 + (2 + 1) * 1)]
+        public void NWeightsFromConfig_With_Testdata(uint[] config, uint length) {
+            Assert.Equal(length, Neural.NWeightsFromConfig(config));
+        }
+        #endregion
         #region Neural.IsJagged
         [Fact]
         public void IsJagged_With_Jagged_Testdata() {

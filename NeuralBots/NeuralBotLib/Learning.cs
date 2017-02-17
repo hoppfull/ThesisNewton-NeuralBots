@@ -48,5 +48,47 @@ namespace NeuralBotLib {
         public static T Roulette<T>(IEnumerable<Tuple<T, double>> candidates, Func<int> rng) {
             return Pick<T>(CostToRouletteValues(candidates), lotto(rng));
         }
+
+        public static double[] TrainNeuralNetwork(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng) {
+            Genetics.Individual[] individuals = new int[10].Select(_ => {
+                int nFeatures = (int)Neural.NWeightsFromConfig(config);
+                Genetics.Gene[] genesA = Genetics.Generate(rng, 48334).Select(x => new Genetics.Gene(x)).Take(nFeatures).ToArray();
+                Genetics.Gene[] genesB = Genetics.Generate(rng, 94353).Select(x => new Genetics.Gene(x)).Take(nFeatures).ToArray();
+                Genetics.Chromosome cA = new Genetics.Chromosome(genesA);
+                Genetics.Chromosome cB = new Genetics.Chromosome(genesB);
+                return new Genetics.Individual(cA, cB);
+            }).ToArray();
+
+            Func<Genetics.Individual, double> individualCost = individual => {
+                double[] wData = individual.Express(Genetics.DefaultGeneExpression);
+                double[][][] wsss = Neural.FoldExpression(wData, config);
+                return Cost(trainingSet, input => Neural.Network(Neural.Sigmoid, wsss, input).ToArray());
+            };
+
+            Func<Genetics.Gene, Genetics.Gene> mutator = Genetics.CreateDefaultGeneMutator(546794);
+            
+            int runs = 0;
+            Tuple<Genetics.Individual, double>[] currentGen =
+                individuals.Select(ind => Tuple.Create(ind, individualCost(ind))).ToArray();
+
+            Tuple<Genetics.Individual, double>[] solutions =
+                new Tuple<Genetics.Individual, double>[0];
+
+            while (solutions.Length == 0) {
+                runs++;
+
+                currentGen = new bool[currentGen.Count()].Select(_ => {
+                    Genetics.Individual mommy = Roulette(currentGen, () => Genetics.Recur(0, 394583, rng));
+                    Genetics.Individual daddy = Roulette(currentGen, () => Genetics.Recur(0, 947393, rng));
+                    Genetics.Individual child = mommy.Mate(() => Genetics.Recur(0, 938752, rng), daddy, mutator);
+                    return Tuple.Create(child, individualCost(child));
+                }).ToArray();
+                
+                solutions = currentGen.Where(ind => ind.Item2 < 0.1).ToArray();
+            }
+
+            //Console.WriteLine($"runs: {runs}");
+            return solutions.OrderBy(solution => solution.Item2).First().Item1.Express(Genetics.DefaultGeneExpression);
+        }
     }
 }

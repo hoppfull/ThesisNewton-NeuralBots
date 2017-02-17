@@ -22,7 +22,7 @@ namespace NeuralBotLibTests {
             TrainingExample[] ex1 = new TrainingExample[] {
                 new TrainingExample(new double[] { 4, 3, 5 }, new double[] { 1, 2, 3 })
             };
-            double expected1 = Math.Pow(1 - 4, 2) + Math.Pow(2 - 3, 2) + Math.Pow(3 - 5, 2);
+            double expected1 = Math.Pow(1- 4 / 2d, 2) + Math.Pow(2 - 3 / 2d, 2) + Math.Pow(3 - 5 / 2d, 2);
 
             TrainingExample[] ex2 = new TrainingExample[] {
                 new TrainingExample(new double[] { 4,3,5,3 }, new double[] { 3,4,4,5 }),
@@ -30,19 +30,19 @@ namespace NeuralBotLibTests {
                 new TrainingExample(new double[] { 1,5,2,3 }, new double[] { 5,4,7,4 })
             };
             double expected2 =
-                (Math.Pow(3 - 4, 2) + Math.Pow(4 - 3, 2) + Math.Pow(4 - 5, 2) + Math.Pow(5 - 3, 2)) +
-                (Math.Pow(8 - 2, 2) + Math.Pow(4 - 3, 2) + Math.Pow(6 - 4, 2) + Math.Pow(4 - 2, 2)) +
-                (Math.Pow(5 - 1, 2) + Math.Pow(4 - 5, 2) + Math.Pow(7 - 2, 2) + Math.Pow(4 - 3, 2));
+                (Math.Pow(3 - 4 / 2d, 2) + Math.Pow(4 - 3 / 2d, 2) + Math.Pow(4 - 5 / 2d, 2) + Math.Pow(5 - 3 / 2d, 2)) +
+                (Math.Pow(8 - 2 / 2d, 2) + Math.Pow(4 - 3 / 2d, 2) + Math.Pow(6 - 4 / 2d, 2) + Math.Pow(4 - 2 / 2d, 2)) +
+                (Math.Pow(5 - 1 / 2d, 2) + Math.Pow(4 - 5 / 2d, 2) + Math.Pow(7 - 2 / 2d, 2) + Math.Pow(4 - 3 / 2d, 2));
 
             TrainingExample[] ex3 = new TrainingExample[] {
                 new TrainingExample(new double[] { 9.234 }, new double[] { 4.5443 })
             };
-            double expected3 = Math.Pow(4.5443 - 9.234, 2);
+            double expected3 = Math.Pow(4.5443 - 9.234 / 2d, 2);
 
-            Assert.Equal(expected0, Cost(ex0, xs => xs));
-            Assert.Equal(expected1, Cost(ex1, xs => xs));
-            Assert.Equal(expected2, Cost(ex2, xs => xs));
-            Assert.Equal(expected3, Cost(ex3, xs => xs));
+            Assert.Equal(expected0, Cost(ex0, xs => xs.Select(x => x / 2d).ToArray()));
+            Assert.Equal(expected1, Cost(ex1, xs => xs.Select(x => x / 2d).ToArray()));
+            Assert.Equal(expected2, Cost(ex2, xs => xs.Select(x => x / 2d).ToArray()));
+            Assert.Equal(expected3, Cost(ex3, xs => xs.Select(x => x / 2d).ToArray()));
         }
         #endregion
 

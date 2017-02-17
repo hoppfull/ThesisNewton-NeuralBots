@@ -59,6 +59,12 @@ namespace NeuralBotLib {
             return result;
         }
 
+        public static uint NWeightsFromConfig(uint[] config) {
+            uint result = 0;
+            for (int i = 1; i < config.Length; i++)
+                result += (config[i - 1] + 1) * config[i];
+            return result;
+        }
         #endregion
     }
 }
