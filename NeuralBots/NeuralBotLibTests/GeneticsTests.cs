@@ -33,8 +33,8 @@ namespace NeuralBotLibTests {
                 new Chromosome(Generate(gene => gene, new Gene(3)).Take(3).ToArray()),
                 new Chromosome(Generate(gene => gene, new Gene(4)).Take(3).ToArray()));
 
-            Individual ind1ab = ind1a.Mate(fa, ind1b, gene => new Gene(gene.Data * 10));
-            Individual ind2ab = ind2a.Mate(fb, ind2b, gene => new Gene(gene.Data * 10));
+            Individual ind1ab = ind1a.Mate(fa, ind1b, gene => new Gene((short)(gene.Data * 10)));
+            Individual ind2ab = ind2a.Mate(fb, ind2b, gene => new Gene((short)(gene.Data * 10)));
 
             Assert.True(ind1ab.cA.Genes.All(gene => gene.Data == 10), "gene.Data = 10");
             Assert.True(ind1ab.cB.Genes.All(gene => gene.Data == 30), "gene.Data = 30");
@@ -63,7 +63,7 @@ namespace NeuralBotLibTests {
         [Fact]
         public void ChromosomeReplicate_Replicates_As_Intended() {
             Chromosome c1 = new Chromosome(Generate(gene => gene, new Gene(0)).Take(5).ToArray());
-            Chromosome c2 = c1.Replicate(gene => new Gene(gene.Data + 1));
+            Chromosome c2 = c1.Replicate(gene => new Gene((short)(gene.Data + 1)));
             Gene[] g1 = c1.Genes.ToArray();
             Gene[] g2 = c2.Genes.ToArray();
             Assert.Equal(g1.Length, g2.Length);

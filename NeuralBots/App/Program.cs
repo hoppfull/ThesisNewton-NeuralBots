@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +12,49 @@ using NeuralBotLib;
 namespace App {
     class Program {
         static void Main(string[] args) {
-            TestOR();
+            Learning.TrainingExample[] exs_pics = new Learning.TrainingExample[] {
+                new Learning.TrainingExample(readImage(new Bitmap("1.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
+                new Learning.TrainingExample(readImage(new Bitmap("2.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
+                new Learning.TrainingExample(readImage(new Bitmap("3.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
+                new Learning.TrainingExample(readImage(new Bitmap("4.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
+                new Learning.TrainingExample(readImage(new Bitmap("5.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
+                new Learning.TrainingExample(readImage(new Bitmap("6.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
+                new Learning.TrainingExample(readImage(new Bitmap("7.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
+                new Learning.TrainingExample(readImage(new Bitmap("8.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
+                new Learning.TrainingExample(readImage(new Bitmap("9.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
+                new Learning.TrainingExample(readImage(new Bitmap("10.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
+                new Learning.TrainingExample(readImage(new Bitmap("11.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
+                new Learning.TrainingExample(readImage(new Bitmap("12.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
+                new Learning.TrainingExample(readImage(new Bitmap("13.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
+                new Learning.TrainingExample(readImage(new Bitmap("14.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
+                new Learning.TrainingExample(readImage(new Bitmap("15.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
+                new Learning.TrainingExample(readImage(new Bitmap("16.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
+                new Learning.TrainingExample(readImage(new Bitmap("17.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
+                new Learning.TrainingExample(readImage(new Bitmap("18.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
+                new Learning.TrainingExample(readImage(new Bitmap("19.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
+                new Learning.TrainingExample(readImage(new Bitmap("20.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 })
+            };
 
-            TestAND();
+            uint[] config = new uint[] { 16 * 16, 8, 5, 2 };
 
-            TestXOR();
+            double[] solution = Learning.TrainNeuralNetwork(exs_pics, config, Genetics.Hash);
+        }
+
+        public static void printPic(Bitmap image) {
+            byte[] pic = readImage(image);
+            for (int x = 0; x < image.Width; x++) {
+                for (int y = 0; y < image.Height; y++)
+                    Console.Write(pic[y * image.Width + x] == 0 ? 'X' : '.');
+                Console.WriteLine();
+            }
+        }
+
+        public static byte[] readImage(Bitmap image) {
+            byte[] result = new byte[image.Width * image.Height];
+            for (int x = 0; x < image.Width; x++)
+                for (int y = 0; y < image.Height; y++)
+                    result[y * image.Width + x] = image.GetPixel(x, y).R;
+            return result;
         }
 
         static void TestOR() {

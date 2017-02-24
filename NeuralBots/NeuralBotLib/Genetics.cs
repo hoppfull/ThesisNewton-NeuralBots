@@ -5,9 +5,9 @@ using System.Linq;
 // http://derekwill.com/2015/03/05/bit-processing-in-c/
 namespace NeuralBotLib {
     public static class Genetics {
-        public class Gene {
-            public int Data { get; }
-            public Gene(int Data) { this.Data = Data; }
+        public struct Gene {
+            public short Data;
+            public Gene(short Data) { this.Data = Data; }
         }
 
         public class Chromosome {
@@ -50,8 +50,16 @@ namespace NeuralBotLib {
             return ((214013 * seed + 2531011) >> 16) & 0x7FFF;
         }
 
-        public static int Hash(int seed) {
-            int x = seed;
+        public static uint Hashu(uint x) {
+            x = (x ^ 61) ^ (x >> 16);
+            x += x << 3;
+            x ^= x >> 4;
+            x *= 0x27d4eb2d;
+            x ^= x >> 15;
+            return x;
+        }
+
+        public static int Hash(int x) {
             x = (x ^ 61) ^ (x >> 16);
             x += x << 3;
             x ^= x >> 4;
@@ -76,15 +84,24 @@ namespace NeuralBotLib {
         }
 
         public static Func<Gene, Gene> CreateDefaultGeneMutator(int seed) {
-            int rn = seed;
+            int rn1 = seed;
+            int rn2 = Hash(rn1);
             return gene => {
-                rn = Hash(rn);
-                return new Gene(gene.Data ^ (1 << rn % 31));
+                rn1 = Hash(rn2);
+                rn2 = Hash(rn1);
+
+                int result = gene.Data;
+                if (rn2 % 10 == 0) result ^= 1 << rn1 % 15;
+                result ^= 1 << rn1 % 11;
+                return new Gene((short) result);
+
+                //return new Gene((short)((rn2 % 10 == 0 ? (short)(gene.Data ^ (1 << rn1 % 15)) : gene.Data) ^ (1 << rn1 % 11)));
+                //return new Gene((short)(gene.Data ^ (1 << rn1 % 15)));
             };
         }
 
         public static double DefaultGeneExpression(Gene geneA, Gene geneB) {
-            return (geneA.Data + geneB.Data) * 1.0e-5;
+            return (geneA.Data + geneB.Data) * 2e-4;
         }
         #endregion
     }
