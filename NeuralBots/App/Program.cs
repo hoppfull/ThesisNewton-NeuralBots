@@ -35,7 +35,7 @@ namespace App {
                 new Learning.TrainingExample(readImage(new Bitmap("20.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 })
             };
 
-            uint[] config = new uint[] { 16 * 16, 8, 5, 2 };
+            uint[] config = new uint[] { 16 * 16, 20, 10, 2 };
 
             double[] solution = Learning.TrainNeuralNetwork(exs_pics, config, Genetics.Hash);
         }
