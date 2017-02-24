@@ -9,24 +9,14 @@ using NeuralBotLib;
 namespace App {
     class Program {
         static void Main(string[] args) {
-            Console.WriteLine("OR:");
-            TestOr();
-            Console.WriteLine("\nAND:");
+            TestOR();
+
             TestAND();
-            Console.WriteLine("\nXOR:");
+
             TestXOR();
         }
 
-        static void Test() {
-            Learning.TrainingExample[] exs = new Learning.TrainingExample[] {
-                new Learning.TrainingExample(new double[] { 0, 0 }, new double[] { 0 }),
-                new Learning.TrainingExample(new double[] { 0, 1 }, new double[] { 1 }),
-                new Learning.TrainingExample(new double[] { 1, 0 }, new double[] { 1 }),
-                new Learning.TrainingExample(new double[] { 1, 1 }, new double[] { 1 })
-            };
-        }
-
-        static void TestOr() {
+        static void TestOR() {
             uint[] config = new uint[] { 2, 2, 1 };
 
             Learning.TrainingExample[] exs_OR = new Learning.TrainingExample[] {
@@ -45,6 +35,7 @@ namespace App {
             double result2 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 1 }).ToArray()[0];
             double result3 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 1 }).ToArray()[0];
 
+            Console.WriteLine("OR:");
             Console.WriteLine($"false Or false = {result0}");
             Console.WriteLine($"true Or false = {result1}");
             Console.WriteLine($"false Or true = {result2}");
@@ -70,10 +61,11 @@ namespace App {
             double result2 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 1 }).ToArray()[0];
             double result3 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 1 }).ToArray()[0];
 
-            Console.WriteLine($"false Or false = {result0}");
-            Console.WriteLine($"true Or false = {result1}");
-            Console.WriteLine($"false Or true = {result2}");
-            Console.WriteLine($"true Or true = {result3}");
+            Console.WriteLine("AND:");
+            Console.WriteLine($"false And false = {result0}");
+            Console.WriteLine($"true And false = {result1}");
+            Console.WriteLine($"false And true = {result2}");
+            Console.WriteLine($"true And true = {result3}");
         }
 
         static void TestXOR() {
@@ -95,10 +87,11 @@ namespace App {
             double result2 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 1 }).ToArray()[0];
             double result3 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 1 }).ToArray()[0];
 
-            Console.WriteLine($"false Or false = {result0}");
-            Console.WriteLine($"true Or false = {result1}");
-            Console.WriteLine($"false Or true = {result2}");
-            Console.WriteLine($"true Or true = {result3}");
+            Console.WriteLine("XOR:");
+            Console.WriteLine($"false Xor false = {result0}");
+            Console.WriteLine($"true Xor false = {result1}");
+            Console.WriteLine($"false Xor true = {result2}");
+            Console.WriteLine($"true Xor true = {result3}");
         }
     }
 }
