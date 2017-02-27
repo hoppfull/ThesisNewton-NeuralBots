@@ -36,7 +36,7 @@ namespace NeuralBotLib {
         }
 
         private static double lotto(Func<int> rng) {
-            return (rng() / 2d) / int.MaxValue + 0.5;
+            return ((double)rng()) / int.MaxValue;
         }
 
         private static T Pick<T>(IEnumerable<Gambler<T>> gamblers, double lotteryWinner) {
@@ -51,8 +51,125 @@ namespace NeuralBotLib {
             return Pick<T>(CostToRouletteValues(candidates), lotto(rng));
         }
 
-        public static double[] TrainNeuralNetwork(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng) {
-            Genetics.Individual[] individuals = new int[10].Select(_ => {
+        public static double[] TrainNeuralNetworkSelectiveBreeding(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng) {
+            Genetics.Individual[] individuals = new int[30].Select(_ => {
+                int nFeatures = (int)Neural.NWeightsFromConfig(config);
+                Genetics.Gene[] genesA = Genetics.Generate(rng, 48334).Select(x => new Genetics.Gene((short)x)).Take(nFeatures).ToArray();
+                Genetics.Gene[] genesB = Genetics.Generate(rng, 94353).Select(x => new Genetics.Gene((short)x)).Take(nFeatures).ToArray();
+                Genetics.Chromosome cA = new Genetics.Chromosome(genesA);
+                Genetics.Chromosome cB = new Genetics.Chromosome(genesB);
+                return new Genetics.Individual(cA, cB);
+            }).ToArray();
+
+            Func<Genetics.Individual, double> individualCost = individual => {
+                double[] wData = individual.Express(Genetics.DefaultGeneExpression);
+                double[][][] wsss = Neural.FoldExpression(wData, config);
+                return Cost(trainingSet, input => Neural.Network(Neural.Sigmoid, wsss, input).ToArray());
+            };
+
+            Func<Genetics.Gene, Genetics.Gene> mutator = Genetics.CreateDefaultGeneMutator(546794);
+
+            Tuple<Genetics.Individual, double>[] currentGen =
+                individuals.Select(ind => Tuple.Create(ind, individualCost(ind))).OrderBy(c => c.Item2).ToArray();
+
+
+            Tuple<Genetics.Individual, double>[] solutions =
+                new Tuple<Genetics.Individual, double>[0];
+
+            int runs = 0;
+            while (solutions.Length == 0) {
+                runs++;
+
+                Tuple<Genetics.Individual, double> uber1 = currentGen[0];
+                Tuple<Genetics.Individual, double> uber2 = currentGen[1];
+
+                {
+                    int _rn = 9479238;
+                    Func<int> _rng = () => {
+                        _rn = Genetics.Hash(_rn);
+                        return _rn;
+                    };
+                    Random r = new Random();
+                    Func<int> __rng = () => {
+                        return r.Next();
+                    };
+                    currentGen = currentGen.AsParallel().Select(c => {
+                        Genetics.Individual child = uber1.Item1.Mate(__rng, uber2.Item1, mutator);
+                        return Tuple.Create(child, individualCost(child));
+                    }).OrderBy(c => c.Item2).ToArray();
+                }
+
+                for (int i = 0; i < Math.Min(currentGen.Length, 10); i++)
+                    Console.Write($"{string.Format("{0:0.000}", currentGen[i].Item2).PadRight(10)}");
+                Console.WriteLine();
+
+                solutions = currentGen.Where(ind => ind.Item2 < 5).ToArray();
+            }
+
+            Console.WriteLine($"runs: {runs}");
+            return solutions.OrderBy(solution => solution.Item2).FirstOrDefault()?.Item1.Express(Genetics.DefaultGeneExpression);
+        }
+
+        public static double[] TrainNeuralNetworkImmortalParents(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng) {
+            Genetics.Individual[] individuals = new int[4].Select(_ => {
+                int nFeatures = (int)Neural.NWeightsFromConfig(config);
+                Genetics.Gene[] genesA = Genetics.Generate(rng, 48334).Select(x => new Genetics.Gene((short)x)).Take(nFeatures).ToArray();
+                Genetics.Gene[] genesB = Genetics.Generate(rng, 94353).Select(x => new Genetics.Gene((short)x)).Take(nFeatures).ToArray();
+                Genetics.Chromosome cA = new Genetics.Chromosome(genesA);
+                Genetics.Chromosome cB = new Genetics.Chromosome(genesB);
+                return new Genetics.Individual(cA, cB);
+            }).ToArray();
+
+            Func<Genetics.Individual, double> individualCost = individual => {
+                double[] wData = individual.Express(Genetics.DefaultGeneExpression);
+                double[][][] wsss = Neural.FoldExpression(wData, config);
+                return Cost(trainingSet, input => Neural.Network(Neural.Sigmoid, wsss, input).ToArray());
+            };
+
+            Func<Genetics.Gene, Genetics.Gene> mutator = Genetics.CreateDefaultGeneMutator(546794);
+
+
+            Tuple<Genetics.Individual, double> daddy = Tuple.Create(individuals[0], individualCost(individuals[0]));
+            Tuple<Genetics.Individual, double> mommy = Tuple.Create(individuals[1], individualCost(individuals[1]));
+            Tuple<Genetics.Individual, double> child = Tuple.Create(individuals[2], individualCost(individuals[2]));
+
+            int runs = 0;
+            while (child.Item2 >= 3) {
+                runs++;
+                
+                if (daddy.Item2 > mommy.Item2) { // daddy worse than mommy?
+                    daddy = daddy.Item2 > child.Item2 ? child : daddy;
+                } else { // mommy worse than daddy?
+                    mommy = mommy.Item2 > child.Item2 ? child : mommy;
+                }
+
+                {
+                    int _rn = 9479238;
+                    Func<int> _rng = () => {
+                        _rn = Genetics.Hash(_rn);
+                        return _rn;
+                    };
+                    Random r = new Random();
+                    Func<int> __rng = () => {
+                        return r.Next();
+                    };
+
+
+                    Genetics.Individual c = mommy.Item1.Mate(__rng, daddy.Item1, mutator);
+                    child = Tuple.Create(c, individualCost(c));
+                }
+                Console.Write($"mommy: {string.Format("{0:0.000}", mommy.Item2)};   ");
+                Console.Write($"daddy: {string.Format("{0:0.000}", daddy.Item2)};   ");
+                Console.Write($"child: {string.Format("{0:0.000}", child.Item2)};");
+                Console.WriteLine();
+            }
+
+            Console.WriteLine($"runs: {runs}");
+            return child.Item1.Express(Genetics.DefaultGeneExpression);
+        }
+
+        public static double[] TrainNeuralNetworkRoulette(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng) {
+            Genetics.Individual[] individuals = new int[30].Select(_ => {
                 int nFeatures = (int)Neural.NWeightsFromConfig(config);
                 Genetics.Gene[] genesA = Genetics.Generate(rng, 48334).Select(x => new Genetics.Gene((short)x)).Take(nFeatures).ToArray();
                 Genetics.Gene[] genesB = Genetics.Generate(rng, 94353).Select(x => new Genetics.Gene((short)x)).Take(nFeatures).ToArray();
@@ -71,65 +188,48 @@ namespace NeuralBotLib {
 
             int runs = 0;
             Tuple<Genetics.Individual, double>[] currentGen =
-                individuals.Select(ind => Tuple.Create(ind, individualCost(ind))).OrderBy(c => c.Item2).ToArray();
+                individuals.Select(ind => Tuple.Create(ind, individualCost(ind))).ToArray();
 
-
-            Tuple<Genetics.Individual, double>[] solutions =
-                new Tuple<Genetics.Individual, double>[0];
-
-            while (solutions.Length == 0) {
+            Genetics.Individual solution = null;
+            while (solution == null) {
                 runs++;
-
-                Tuple<Genetics.Individual, double> uber1 = currentGen[0];
-                Tuple<Genetics.Individual, double> uber2 = currentGen[1];
-
-                //Tuple<Genetics.Individual, double>[] nextGen = new bool[currentGen.Count()].AsParallel().Select(_ => {
-                //    Genetics.Individual mommy = Roulette(currentGen, () => Genetics.Recur(0, 394583, rng));
-                //    Genetics.Individual daddy;
-                //    for (int i = 0; ; i++) {
-                //        daddy = Roulette(currentGen, () => Genetics.Recur(i, 947393, rng));
-                //        if (mommy != daddy) break;
-                //    }
-                //    Genetics.Individual child = mommy.Mate(() => Genetics.Recur(0, 938752, rng), daddy, mutator);
-                //    return Tuple.Create(child, individualCost(child));
-                //}).OrderBy(c => c.Item2).ToArray();
-
-                //for (int i = 0; i < currentGen.Length; i++) {
-                //    Genetics.Individual child = uber1.Item1.Mate(() => Genetics.Recur(i, 948539, rng), uber2.Item1, mutator);
-                //    currentGen[i] = Tuple.Create(child, individualCost(child));
-                //}
+                
                 {
                     int _rn = 9479238;
                     Func<int> _rng = () => {
                         _rn = Genetics.Hash(_rn);
                         return _rn;
                     };
-                    currentGen = currentGen.AsParallel().Select(c => {
-                        Genetics.Individual child = uber1.Item1.Mate(_rng, uber2.Item1, mutator);
+
+                    Random r = new Random();
+                    Func<int> __rng = () => {
+                        return r.Next();
+                    };
+                    
+                    currentGen = new bool[currentGen.Count()].AsParallel().Select(_ => {
+                        Genetics.Individual mommy = Roulette(currentGen, __rng);
+                        Genetics.Individual daddy = Roulette(currentGen, _rng);
+                        //Genetics.Individual daddy;
+                        //for (int i = 0; ; i++) {
+                        //    daddy = Roulette(currentGen, __rng);
+                        //    if (mommy != daddy) break;
+                        //}
+                        Genetics.Individual child = mommy.Mate(__rng, daddy, mutator);
                         return Tuple.Create(child, individualCost(child));
                     }).OrderBy(c => c.Item2).ToArray();
                 }
                 
-                //currentGen[0] = currentGen[0].Item2 < uber1.Item2 ? currentGen[0] : uber1;
-                //currentGen[1] = currentGen[1].Item2 < uber2.Item2 ? currentGen[1] : uber2;
-
-                //nextGen[nextGen.Length - 1] = currentGen[0];
-                //nextGen[nextGen.Length - 2] = currentGen[1];
-                //nextGen[nextGen.Length - 3] = currentGen[2];
-                //nextGen[nextGen.Length - 4] = currentGen[3];
-                //nextGen[nextGen.Length - 5] = currentGen[4];
-
-
                 for (int i = 0; i < Math.Min(currentGen.Length, 10); i++)
                     Console.Write($"{string.Format("{0:0.000}", currentGen[i].Item2).PadRight(10)}");
                 Console.WriteLine();
+                
 
-                //currentGen = nextGen.OrderBy(c => c.Item2).ToArray();
-                solutions = currentGen.Where(ind => ind.Item2 < 0.1).ToArray();
+
+                solution = currentGen[0].Item2 < 5 ? currentGen[0].Item1 : null;
             }
 
             Console.WriteLine($"runs: {runs}");
-            return solutions.OrderBy(solution => solution.Item2).FirstOrDefault()?.Item1.Express(Genetics.DefaultGeneExpression);
+            return solution.Express(Genetics.DefaultGeneExpression);
         }
     }
 }

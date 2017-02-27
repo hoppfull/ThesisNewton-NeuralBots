@@ -12,32 +12,24 @@ using NeuralBotLib;
 namespace App {
     class Program {
         static void Main(string[] args) {
-            Learning.TrainingExample[] exs_pics = new Learning.TrainingExample[] {
-                new Learning.TrainingExample(readImage(new Bitmap("1.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
-                new Learning.TrainingExample(readImage(new Bitmap("2.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
-                new Learning.TrainingExample(readImage(new Bitmap("3.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
-                new Learning.TrainingExample(readImage(new Bitmap("4.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
-                new Learning.TrainingExample(readImage(new Bitmap("5.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
-                new Learning.TrainingExample(readImage(new Bitmap("6.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
-                new Learning.TrainingExample(readImage(new Bitmap("7.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
-                new Learning.TrainingExample(readImage(new Bitmap("8.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
-                new Learning.TrainingExample(readImage(new Bitmap("9.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
-                new Learning.TrainingExample(readImage(new Bitmap("10.bmp")).Select(b => (double)b).ToArray(), new double[] { 0, 1 }),
-                new Learning.TrainingExample(readImage(new Bitmap("11.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
-                new Learning.TrainingExample(readImage(new Bitmap("12.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
-                new Learning.TrainingExample(readImage(new Bitmap("13.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
-                new Learning.TrainingExample(readImage(new Bitmap("14.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
-                new Learning.TrainingExample(readImage(new Bitmap("15.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
-                new Learning.TrainingExample(readImage(new Bitmap("16.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
-                new Learning.TrainingExample(readImage(new Bitmap("17.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
-                new Learning.TrainingExample(readImage(new Bitmap("18.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
-                new Learning.TrainingExample(readImage(new Bitmap("19.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 }),
-                new Learning.TrainingExample(readImage(new Bitmap("20.bmp")).Select(b => (double)b).ToArray(), new double[] { 1, 0 })
-            };
+            Learning.TrainingExample[] exs_pics = new Learning.TrainingExample[100];
 
-            uint[] config = new uint[] { 16 * 16, 20, 10, 2 };
+            for (int i = 1; i <= 50; i++)
+                exs_pics[i - 1] = new Learning.TrainingExample(readImage(new Bitmap($"{string.Format("o{00:00}.bmp", i)}")).Select(b => (double)b).ToArray(), new double[] { 0, 1 });
 
-            double[] solution = Learning.TrainNeuralNetwork(exs_pics, config, Genetics.Hash);
+            for (int i = 1; i <= 50; i++)
+                exs_pics[i + 49] = new Learning.TrainingExample(readImage(new Bitmap($"{string.Format("x{00:00}.bmp", i)}")).Select(b => (double)b).ToArray(), new double[] { 1, 0 });
+            
+            uint[] config = new uint[] { 16 * 16, 30, 4, 2 };
+
+            double[] solution = Learning.TrainNeuralNetworkSelectiveBreeding(exs_pics, config, Genetics.Hash);
+
+            double[][][] wsss = Neural.FoldExpression(solution, config);
+            double[] cross = Neural.Network(Neural.Sigmoid, wsss, readImage(new Bitmap("test01o.bmp")).Select(b => (double)b)).ToArray();
+            double[] circle = Neural.Network(Neural.Sigmoid, wsss, readImage(new Bitmap("test11x.bmp")).Select(b => (double)b)).ToArray();
+
+            Console.WriteLine($"TESTING CROSS\n\tProbability of cross: {cross[0]}, Probability of circle: {cross[1]}");
+            Console.WriteLine($"TESTING CIRCLE\n\tProbability of cross: {circle[0]}, Probability of circle: {circle[1]}");
         }
 
         public static void printPic(Bitmap image) {
@@ -57,82 +49,82 @@ namespace App {
             return result;
         }
 
-        static void TestOR() {
-            uint[] config = new uint[] { 2, 2, 1 };
+        //static void TestOR() {
+        //    uint[] config = new uint[] { 2, 2, 1 };
 
-            Learning.TrainingExample[] exs_OR = new Learning.TrainingExample[] {
-                new Learning.TrainingExample(new double[] { 0, 0 }, new double[] { 0 }),
-                new Learning.TrainingExample(new double[] { 0, 1 }, new double[] { 1 }),
-                new Learning.TrainingExample(new double[] { 1, 0 }, new double[] { 1 }),
-                new Learning.TrainingExample(new double[] { 1, 1 }, new double[] { 1 })
-            };
+        //    Learning.TrainingExample[] exs_OR = new Learning.TrainingExample[] {
+        //        new Learning.TrainingExample(new double[] { 0, 0 }, new double[] { 0 }),
+        //        new Learning.TrainingExample(new double[] { 0, 1 }, new double[] { 1 }),
+        //        new Learning.TrainingExample(new double[] { 1, 0 }, new double[] { 1 }),
+        //        new Learning.TrainingExample(new double[] { 1, 1 }, new double[] { 1 })
+        //    };
 
-            double[] solution = Learning.TrainNeuralNetwork(exs_OR, config, Genetics.Hash);
+        //    double[] solution = Learning.TrainNeuralNetwork(exs_OR, config, Genetics.Hash);
 
-            double[][][] wsss = Neural.FoldExpression(solution, config);
+        //    double[][][] wsss = Neural.FoldExpression(solution, config);
 
-            double result0 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 0 }).ToArray()[0];
-            double result1 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 0 }).ToArray()[0];
-            double result2 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 1 }).ToArray()[0];
-            double result3 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 1 }).ToArray()[0];
+        //    double result0 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 0 }).ToArray()[0];
+        //    double result1 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 0 }).ToArray()[0];
+        //    double result2 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 1 }).ToArray()[0];
+        //    double result3 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 1 }).ToArray()[0];
 
-            Console.WriteLine("OR:");
-            Console.WriteLine($"false Or false = {result0}");
-            Console.WriteLine($"true Or false = {result1}");
-            Console.WriteLine($"false Or true = {result2}");
-            Console.WriteLine($"true Or true = {result3}");
-        }
+        //    Console.WriteLine("OR:");
+        //    Console.WriteLine($"false Or false = {result0}");
+        //    Console.WriteLine($"true Or false = {result1}");
+        //    Console.WriteLine($"false Or true = {result2}");
+        //    Console.WriteLine($"true Or true = {result3}");
+        //}
 
-        static void TestAND() {
-            uint[] config = new uint[] { 2, 2, 1 };
+        //static void TestAND() {
+        //    uint[] config = new uint[] { 2, 2, 1 };
 
-            Learning.TrainingExample[] exs_AND = new Learning.TrainingExample[] {
-                new Learning.TrainingExample(new double[] { 0, 0 }, new double[] { 0 }),
-                new Learning.TrainingExample(new double[] { 0, 1 }, new double[] { 0 }),
-                new Learning.TrainingExample(new double[] { 1, 0 }, new double[] { 0 }),
-                new Learning.TrainingExample(new double[] { 1, 1 }, new double[] { 1 })
-            };
+        //    Learning.TrainingExample[] exs_AND = new Learning.TrainingExample[] {
+        //        new Learning.TrainingExample(new double[] { 0, 0 }, new double[] { 0 }),
+        //        new Learning.TrainingExample(new double[] { 0, 1 }, new double[] { 0 }),
+        //        new Learning.TrainingExample(new double[] { 1, 0 }, new double[] { 0 }),
+        //        new Learning.TrainingExample(new double[] { 1, 1 }, new double[] { 1 })
+        //    };
 
-            double[] solution = Learning.TrainNeuralNetwork(exs_AND, config, Genetics.Hash);
+        //    double[] solution = Learning.TrainNeuralNetwork(exs_AND, config, Genetics.Hash);
 
-            double[][][] wsss = Neural.FoldExpression(solution, config);
+        //    double[][][] wsss = Neural.FoldExpression(solution, config);
 
-            double result0 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 0 }).ToArray()[0];
-            double result1 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 0 }).ToArray()[0];
-            double result2 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 1 }).ToArray()[0];
-            double result3 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 1 }).ToArray()[0];
+        //    double result0 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 0 }).ToArray()[0];
+        //    double result1 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 0 }).ToArray()[0];
+        //    double result2 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 1 }).ToArray()[0];
+        //    double result3 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 1 }).ToArray()[0];
 
-            Console.WriteLine("AND:");
-            Console.WriteLine($"false And false = {result0}");
-            Console.WriteLine($"true And false = {result1}");
-            Console.WriteLine($"false And true = {result2}");
-            Console.WriteLine($"true And true = {result3}");
-        }
+        //    Console.WriteLine("AND:");
+        //    Console.WriteLine($"false And false = {result0}");
+        //    Console.WriteLine($"true And false = {result1}");
+        //    Console.WriteLine($"false And true = {result2}");
+        //    Console.WriteLine($"true And true = {result3}");
+        //}
 
-        static void TestXOR() {
-            uint[] config = new uint[] { 2, 2, 1 };
+        //static void TestXOR() {
+        //    uint[] config = new uint[] { 2, 2, 1 };
 
-            Learning.TrainingExample[] exs_XOR = new Learning.TrainingExample[] {
-                new Learning.TrainingExample(new double[] { 0, 0 }, new double[] { 0 }),
-                new Learning.TrainingExample(new double[] { 0, 1 }, new double[] { 1 }),
-                new Learning.TrainingExample(new double[] { 1, 0 }, new double[] { 1 }),
-                new Learning.TrainingExample(new double[] { 1, 1 }, new double[] { 0 })
-            };
+        //    Learning.TrainingExample[] exs_XOR = new Learning.TrainingExample[] {
+        //        new Learning.TrainingExample(new double[] { 0, 0 }, new double[] { 0 }),
+        //        new Learning.TrainingExample(new double[] { 0, 1 }, new double[] { 1 }),
+        //        new Learning.TrainingExample(new double[] { 1, 0 }, new double[] { 1 }),
+        //        new Learning.TrainingExample(new double[] { 1, 1 }, new double[] { 0 })
+        //    };
 
-            double[] solution = Learning.TrainNeuralNetwork(exs_XOR, config, Genetics.Hash);
+        //    double[] solution = Learning.TrainNeuralNetwork(exs_XOR, config, Genetics.Hash);
 
-            double[][][] wsss = Neural.FoldExpression(solution, config);
+        //    double[][][] wsss = Neural.FoldExpression(solution, config);
 
-            double result0 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 0 }).ToArray()[0];
-            double result1 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 0 }).ToArray()[0];
-            double result2 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 1 }).ToArray()[0];
-            double result3 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 1 }).ToArray()[0];
+        //    double result0 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 0 }).ToArray()[0];
+        //    double result1 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 0 }).ToArray()[0];
+        //    double result2 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 0, 1 }).ToArray()[0];
+        //    double result3 = Neural.Network(Neural.Sigmoid, wsss, new double[] { 1, 1 }).ToArray()[0];
 
-            Console.WriteLine("XOR:");
-            Console.WriteLine($"false Xor false = {result0}");
-            Console.WriteLine($"true Xor false = {result1}");
-            Console.WriteLine($"false Xor true = {result2}");
-            Console.WriteLine($"true Xor true = {result3}");
-        }
+        //    Console.WriteLine("XOR:");
+        //    Console.WriteLine($"false Xor false = {result0}");
+        //    Console.WriteLine($"true Xor false = {result1}");
+        //    Console.WriteLine($"false Xor true = {result2}");
+        //    Console.WriteLine($"true Xor true = {result3}");
+        //}
     }
 }

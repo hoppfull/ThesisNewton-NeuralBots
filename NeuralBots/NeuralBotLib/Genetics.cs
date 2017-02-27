@@ -94,9 +94,6 @@ namespace NeuralBotLib {
                 if (rn2 % 10 == 0) result ^= 1 << rn1 % 15;
                 result ^= 1 << rn1 % 11;
                 return new Gene((short) result);
-
-                //return new Gene((short)((rn2 % 10 == 0 ? (short)(gene.Data ^ (1 << rn1 % 15)) : gene.Data) ^ (1 << rn1 % 11)));
-                //return new Gene((short)(gene.Data ^ (1 << rn1 % 15)));
             };
         }
 
