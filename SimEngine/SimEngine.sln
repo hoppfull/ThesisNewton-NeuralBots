@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "App\App.csproj", "{6B1F6370-26CF-4E61-A069-B3F9C74D2214}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenderingEngine", "RenderingEngine\RenderingEngine.csproj", "{3D538957-7549-4949-B728-9A0D985CC260}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysicsEngine", "PhysicsEngine\PhysicsEngine.csproj", "{83E19D37-0BBF-445E-8E15-D3158CE1C77C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B1F6370-26CF-4E61-A069-B3F9C74D2214}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B1F6370-26CF-4E61-A069-B3F9C74D2214}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B1F6370-26CF-4E61-A069-B3F9C74D2214}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B1F6370-26CF-4E61-A069-B3F9C74D2214}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D538957-7549-4949-B728-9A0D985CC260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D538957-7549-4949-B728-9A0D985CC260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D538957-7549-4949-B728-9A0D985CC260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D538957-7549-4949-B728-9A0D985CC260}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83E19D37-0BBF-445E-8E15-D3158CE1C77C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83E19D37-0BBF-445E-8E15-D3158CE1C77C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83E19D37-0BBF-445E-8E15-D3158CE1C77C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83E19D37-0BBF-445E-8E15-D3158CE1C77C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
