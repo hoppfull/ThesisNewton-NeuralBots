@@ -22,16 +22,26 @@ namespace App {
 
             uint[] config = new uint[] { 16 * 16, 30, 4, 2 };
 
-            double[] solution = Learning.TrainNeuralNetworkRuleofTwo(exs_pics, config, Genetics.Hash, 1);
-            //double[] solution = Learning.TrainNeuralNetworkSelectiveBreeding(exs_pics, config, Genetics.Hash, 1);
+            //double[] solution = Learning.TrainNeuralNetworkRuleofTwo(exs_pics, config, Genetics.Hash, 1);
+            double[] solution = Learning.TrainNeuralNetworkSelectiveBreeding(exs_pics, config, Genetics.Hash, 50);
             //double[] solution = Learning.TrainNeuralNetworkRoulette(exs_pics, config, Genetics.Hash, 1);
 
             double[][][] wsss = Neural.FoldExpression(solution, config);
             double[] cross = Neural.Network(Neural.Sigmoid, wsss, readImage(new Bitmap("test01o.bmp")).Select(b => (double)b)).ToArray();
             double[] circle = Neural.Network(Neural.Sigmoid, wsss, readImage(new Bitmap("test11x.bmp")).Select(b => (double)b)).ToArray();
 
-            Console.WriteLine($"TESTING CROSS\n\tProbability of cross: {cross[0]}, Probability of circle: {cross[1]}");
-            Console.WriteLine($"TESTING CIRCLE\n\tProbability of cross: {circle[0]}, Probability of circle: {circle[1]}");
+            int nCorrects = 0;
+            for (int i = 1; i <= 10; i++) {
+                double[] outs= Neural.Network(Neural.Sigmoid, wsss, readImage(new Bitmap(string.Format("test{00:00}o.bmp", i))).Select(b => (double)b)).ToArray();
+                Console.WriteLine($"TESTING CROSS\n\tProbability of cross: {outs[0]}, Probability of circle: {outs[1]}");
+                if (outs[0] < outs[1]) nCorrects++;
+            }
+            for (int i = 11; i <= 20; i++) {
+                double[] outs = Neural.Network(Neural.Sigmoid, wsss, readImage(new Bitmap(string.Format("test{00:00}x.bmp", i))).Select(b => (double)b)).ToArray();
+                Console.WriteLine($"TESTING CIRCLE\n\tProbability of cross: {outs[0]}, Probability of circle: {outs[1]}");
+                if (outs[0] > outs[1]) nCorrects++;
+            }
+            Console.WriteLine($"nCorrects={nCorrects}");
         }
 
         public static void printPic(Bitmap image) {
