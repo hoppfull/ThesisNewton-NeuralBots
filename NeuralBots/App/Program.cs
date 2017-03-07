@@ -19,10 +19,12 @@ namespace App {
 
             for (int i = 1; i <= 50; i++)
                 exs_pics[i + 49] = new Learning.TrainingExample(readImage(new Bitmap($"{string.Format("x{00:00}.bmp", i)}")).Select(b => (double)b).ToArray(), new double[] { 1, 0 });
-            
+
             uint[] config = new uint[] { 16 * 16, 30, 4, 2 };
 
-            double[] solution = Learning.TrainNeuralNetworkSelectiveBreeding(exs_pics, config, Genetics.Hash);
+            double[] solution = Learning.TrainNeuralNetworkRuleofTwo(exs_pics, config, Genetics.Hash, 1);
+            //double[] solution = Learning.TrainNeuralNetworkSelectiveBreeding(exs_pics, config, Genetics.Hash, 1);
+            //double[] solution = Learning.TrainNeuralNetworkRoulette(exs_pics, config, Genetics.Hash, 1);
 
             double[][][] wsss = Neural.FoldExpression(solution, config);
             double[] cross = Neural.Network(Neural.Sigmoid, wsss, readImage(new Bitmap("test01o.bmp")).Select(b => (double)b)).ToArray();
@@ -59,7 +61,7 @@ namespace App {
         //        new Learning.TrainingExample(new double[] { 1, 1 }, new double[] { 1 })
         //    };
 
-        //    double[] solution = Learning.TrainNeuralNetwork(exs_OR, config, Genetics.Hash);
+        //    double[] solution = Learning.TrainNeuralNetworkRoulette(exs_OR, config, Genetics.Hash);
 
         //    double[][][] wsss = Neural.FoldExpression(solution, config);
 
@@ -102,7 +104,7 @@ namespace App {
         //}
 
         //static void TestXOR() {
-        //    uint[] config = new uint[] { 2, 2, 1 };
+        //    uint[] config = new uint[] { 2, 5, 1 };
 
         //    Learning.TrainingExample[] exs_XOR = new Learning.TrainingExample[] {
         //        new Learning.TrainingExample(new double[] { 0, 0 }, new double[] { 0 }),
@@ -111,7 +113,9 @@ namespace App {
         //        new Learning.TrainingExample(new double[] { 1, 1 }, new double[] { 0 })
         //    };
 
-        //    double[] solution = Learning.TrainNeuralNetwork(exs_XOR, config, Genetics.Hash);
+        //    //double[] solution = Learning.TrainNeuralNetworkRuleofTwo(exs_XOR, config, Genetics.Hash, 0.01);
+        //    //double[] solution = Learning.TrainNeuralNetworkSelectiveBreeding(exs_XOR, config, Genetics.Hash, 0.01);
+        //    double[] solution = Learning.TrainNeuralNetworkRoulette(exs_XOR, config, Genetics.Hash, 0.01);
 
         //    double[][][] wsss = Neural.FoldExpression(solution, config);
 

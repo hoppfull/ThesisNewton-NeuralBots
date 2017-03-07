@@ -51,7 +51,7 @@ namespace NeuralBotLib {
             return Pick<T>(CostToRouletteValues(candidates), lotto(rng));
         }
 
-        public static double[] TrainNeuralNetworkSelectiveBreeding(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng) {
+        public static double[] TrainNeuralNetworkSelectiveBreeding(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng, double threshold) {
             Genetics.Individual[] individuals = new int[30].Select(_ => {
                 int nFeatures = (int)Neural.NWeightsFromConfig(config);
                 Genetics.Gene[] genesA = Genetics.Generate(rng, 48334).Select(x => new Genetics.Gene((short)x)).Take(nFeatures).ToArray();
@@ -103,15 +103,15 @@ namespace NeuralBotLib {
                     Console.Write($"{string.Format("{0:0.000}", currentGen[i].Item2).PadRight(10)}");
                 Console.WriteLine();
 
-                solutions = currentGen.Where(ind => ind.Item2 < 5).ToArray();
+                solutions = currentGen.Where(ind => ind.Item2 <= threshold).ToArray();
             }
 
             Console.WriteLine($"runs: {runs}");
             return solutions.OrderBy(solution => solution.Item2).FirstOrDefault()?.Item1.Express(Genetics.DefaultGeneExpression);
         }
 
-        public static double[] TrainNeuralNetworkImmortalParents(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng) {
-            Genetics.Individual[] individuals = new int[4].Select(_ => {
+        public static double[] TrainNeuralNetworkRuleofTwo(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng, double threshold) {
+            Genetics.Individual[] individuals = new int[3].Select(_ => {
                 int nFeatures = (int)Neural.NWeightsFromConfig(config);
                 Genetics.Gene[] genesA = Genetics.Generate(rng, 48334).Select(x => new Genetics.Gene((short)x)).Take(nFeatures).ToArray();
                 Genetics.Gene[] genesB = Genetics.Generate(rng, 94353).Select(x => new Genetics.Gene((short)x)).Take(nFeatures).ToArray();
@@ -134,7 +134,7 @@ namespace NeuralBotLib {
             Tuple<Genetics.Individual, double> child = Tuple.Create(individuals[2], individualCost(individuals[2]));
 
             int runs = 0;
-            while (child.Item2 >= 3) {
+            while (child.Item2 >= threshold) {
                 runs++;
                 
                 if (daddy.Item2 > mommy.Item2) { // daddy worse than mommy?
@@ -168,7 +168,7 @@ namespace NeuralBotLib {
             return child.Item1.Express(Genetics.DefaultGeneExpression);
         }
 
-        public static double[] TrainNeuralNetworkRoulette(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng) {
+        public static double[] TrainNeuralNetworkRoulette(TrainingExample[] trainingSet, uint[] config, Func<int, int> rng, double threshold) {
             Genetics.Individual[] individuals = new int[30].Select(_ => {
                 int nFeatures = (int)Neural.NWeightsFromConfig(config);
                 Genetics.Gene[] genesA = Genetics.Generate(rng, 48334).Select(x => new Genetics.Gene((short)x)).Take(nFeatures).ToArray();
@@ -208,7 +208,7 @@ namespace NeuralBotLib {
                     
                     currentGen = new bool[currentGen.Count()].AsParallel().Select(_ => {
                         Genetics.Individual mommy = Roulette(currentGen, __rng);
-                        Genetics.Individual daddy = Roulette(currentGen, _rng);
+                        Genetics.Individual daddy = Roulette(currentGen, __rng);
                         //Genetics.Individual daddy;
                         //for (int i = 0; ; i++) {
                         //    daddy = Roulette(currentGen, __rng);
@@ -225,7 +225,7 @@ namespace NeuralBotLib {
                 
 
 
-                solution = currentGen[0].Item2 < 5 ? currentGen[0].Item1 : null;
+                solution = currentGen[0].Item2 <= threshold ? currentGen[0].Item1 : null;
             }
 
             Console.WriteLine($"runs: {runs}");
